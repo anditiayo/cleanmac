@@ -98,11 +98,7 @@ public final class DashboardViewModel: ObservableObject {
     }
 
     public func requestScan() {
-        if !hasAllowedScanPermission {
-            showScanPermissionSheet = true
-        } else {
-            startScanWithOptions()
-        }
+        startScanWithOptions()
     }
 
     public func saveAndApplyPermissions(_ permissions: ScanPermissions, remember: Bool) {

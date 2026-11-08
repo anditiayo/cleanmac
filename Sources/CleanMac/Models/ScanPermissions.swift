@@ -24,5 +24,24 @@ public struct ScanPermissions: Codable, Equatable {
     public var hasAnySelected: Bool {
         scanApplications || scanLargeFiles || scanCaches || scanJunk || scanDeepDirectories
     }
-}
 
+    public var allSelected: Bool {
+        scanApplications && scanLargeFiles && scanCaches && scanJunk && scanDeepDirectories
+    }
+
+    public mutating func selectAll() {
+        scanApplications = true
+        scanLargeFiles = true
+        scanCaches = true
+        scanJunk = true
+        scanDeepDirectories = true
+    }
+
+    public mutating func deselectAll() {
+        scanApplications = false
+        scanLargeFiles = false
+        scanCaches = false
+        scanJunk = false
+        scanDeepDirectories = false
+    }
+}

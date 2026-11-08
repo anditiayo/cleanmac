@@ -15,8 +15,8 @@ public struct ScanPermissionSheet: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // Header
-            HStack(spacing: 16) {
+            // Header with Icon, Title, and Select All Pill
+            HStack(spacing: 14) {
                 ZStack {
                     Circle()
                         .fill(
@@ -26,17 +26,17 @@ public struct ScanPermissionSheet: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 50, height: 50)
+                        .frame(width: 46, height: 46)
 
                     Image(systemName: "checkmark.shield.fill")
-                        .font(.system(size: 24))
+                        .font(.system(size: 22))
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
                         Text(loc("perm.title"))
-                            .font(.title2)
+                            .font(.title3)
                             .fontWeight(.bold)
 
                         Text(loc("perm.badge"))
@@ -49,29 +49,71 @@ public struct ScanPermissionSheet: View {
                     }
 
                     Text(loc("perm.sub"))
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundColor(.secondary)
                 }
 
                 Spacer()
+
+                // Integrated Select All / Deselect All Pill
+                HStack(spacing: 0) {
+                    Button {
+                        permissions.selectAll()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(.blue)
+                            Text(loc("action.selectAll"))
+                                .font(.system(size: 11, weight: .semibold))
+                        }
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                    }
+                    .buttonStyle(.plain)
+
+                    Divider()
+                        .frame(height: 12)
+
+                    Button {
+                        permissions.deselectAll()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "xmark.circle")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                            Text(loc("action.deselectAll"))
+                                .font(.system(size: 11, weight: .medium))
+                        }
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .background(Color(nsColor: .controlBackgroundColor))
+                .cornerRadius(7)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7)
+                        .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                )
 
                 Button {
                     viewModel.showScanPermissionSheet = false
                     dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
+                        .font(.title3)
                         .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
             }
-            .padding(20)
+            .padding(18)
 
             Divider()
 
             // Checklist Content
             ScrollView {
-                VStack(spacing: 10) {
+                VStack(spacing: 9) {
                     checklistRow(
                         title: loc("perm.appsTitle"),
                         description: loc("perm.appsDesc"),
@@ -112,7 +154,7 @@ public struct ScanPermissionSheet: View {
                         isOn: $permissions.scanDeepDirectories
                     )
                 }
-                .padding(20)
+                .padding(18)
             }
             .frame(maxHeight: 280)
 
@@ -167,7 +209,7 @@ public struct ScanPermissionSheet: View {
             .padding(16)
             .background(Color(nsColor: .windowBackgroundColor).opacity(0.6))
         }
-        .frame(width: 530, height: 450)
+        .frame(width: 550, height: 450)
     }
 
     private func checklistRow(
@@ -181,12 +223,10 @@ public struct ScanPermissionSheet: View {
             isOn.wrappedValue.toggle()
         } label: {
             HStack(spacing: 14) {
-                // Checkbox toggle
                 Image(systemName: isOn.wrappedValue ? "checkmark.square.fill" : "square")
                     .font(.system(size: 18))
                     .foregroundColor(isOn.wrappedValue ? .accentColor : .secondary)
 
-                // Icon
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(iconColor.opacity(0.15))
@@ -197,7 +237,6 @@ public struct ScanPermissionSheet: View {
                         .foregroundColor(iconColor)
                 }
 
-                // Text
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.system(size: 13, weight: .semibold))
