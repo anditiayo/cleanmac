@@ -1,0 +1,8 @@
+.DS_Store
+.build/
+CleanMac.app/
+Packages/
+*.xcodeproj
+*.xcworkspace
+.swiftpm/
+
