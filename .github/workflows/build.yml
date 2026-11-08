@@ -18,3 +18,4 @@ jobs:
       run: |
         swift --version
         swift build -c release
+

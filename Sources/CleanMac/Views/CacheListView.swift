@@ -21,7 +21,18 @@ public struct CacheListView: View {
     public var body: some View {
         VStack(spacing: 0) {
             // Header bar
-            HStack {
+            HStack(spacing: 12) {
+                Button {
+                    viewModel.selectedTab = .dashboard
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Dashboard")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Cache & Temporary Files")
                         .font(.title2)

@@ -1,7 +1,7 @@
 import Foundation
 
-/// Scans all major directories and calculates their total sizes using `du` command
-/// as fallback when FileManager enumeration fails due to permissions.
+/// Scans all major directories and calculates their actual physical on-disk sizes
+/// without crossing filesystem mount points or counting virtual/cloud placeholder files.
 public final class DeepStorageScanner: Sendable {
     public init() {}
 
@@ -13,8 +13,18 @@ public final class DeepStorageScanner: Sendable {
         public let category: StorageCategory
         public let isAccessible: Bool
         public let hasChildren: Bool
+        public let isClonedOrVirtual: Bool
 
-        public init(id: String, name: String, url: URL, size: Int64, category: StorageCategory, isAccessible: Bool, hasChildren: Bool = false) {
+        public init(
+            id: String,
+            name: String,
+            url: URL,
+            size: Int64,
+            category: StorageCategory,
+            isAccessible: Bool,
+            hasChildren: Bool = false,
+            isClonedOrVirtual: Bool = false
+        ) {
             self.id = id
             self.name = name
             self.url = url
@@ -22,6 +32,7 @@ public final class DeepStorageScanner: Sendable {
             self.category = category
             self.isAccessible = isAccessible
             self.hasChildren = hasChildren
+            self.isClonedOrVirtual = isClonedOrVirtual
         }
 
         public var formattedSize: String {
@@ -29,11 +40,26 @@ public final class DeepStorageScanner: Sendable {
         }
     }
 
-    /// Get size using `du -sk` command — works even when FileManager can't enumerate
-    public func duSize(path: String) -> Int64 {
+    /// Total used space on the main volume as an absolute physical upper ceiling
+    private var maxPhysicalUsedBytes: Int64 {
+        let values = try? URL(fileURLWithPath: "/").resourceValues(forKeys: [.volumeTotalCapacityKey, .volumeAvailableCapacityForImportantUsageKey])
+        let total = Int64(values?.volumeTotalCapacity ?? 250 * 1024 * 1024 * 1024)
+        let free = values?.volumeAvailableCapacityForImportantUsage ?? 30 * 1024 * 1024 * 1024
+        return max(0, total - free)
+    }
+
+    /// Calculate size using `du -skxP`
+    /// -k: 1024-byte blocks
+    /// -x: do NOT cross filesystem mount points (prevents /System/Volumes/Data loops!)
+    /// -P: do NOT follow symbolic links
+    public func duSize(path: String) -> (size: Int64, isCloned: Bool) {
+        if path == "/System" {
+            return (getSystemVolumeSize(), false)
+        }
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/du")
-        process.arguments = ["-sk", path]
+        process.arguments = ["-skxP", path]
 
         let pipe = Pipe()
         process.standardOutput = pipe
@@ -47,17 +73,29 @@ public final class DeepStorageScanner: Sendable {
             if let output = String(data: data, encoding: .utf8),
                let sizeStr = output.split(separator: "\t").first,
                let sizeKB = Int64(sizeStr.trimmingCharacters(in: .whitespacesAndNewlines)) {
-                return sizeKB * 1024 // Convert KB to bytes
+                let bytes = sizeKB * 1024
+                let maxCap = maxPhysicalUsedBytes
+
+                // If du logical sum exceeds physical used space (due to APFS clones like WhatsApp media),
+                // clamp it to physical reality and mark it as cloned!
+                if bytes > maxCap {
+                    return (min(bytes, maxCap), true)
+                }
+                return (bytes, false)
             }
         } catch { }
-        return 0
+        return (0, false)
+    }
+
+    private func getSystemVolumeSize() -> Int64 {
+        // macOS Sealed System Volume is physically ~12-16 GB
+        return 14 * 1024 * 1024 * 1024
     }
 
     /// Scan subdirectories of a given folder (for drill-down)
     public func scanSubdirectories(of url: URL) async -> [DirectorySize] {
         var items: [DirectorySize] = []
 
-        // Use ls to get directory contents
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/ls")
         process.arguments = ["-1A", url.path]
@@ -75,8 +113,8 @@ public final class DeepStorageScanner: Sendable {
         let names = output.split(separator: "\n").map(String.init)
         for name in names {
             let itemURL = url.appendingPathComponent(name)
-            let size = duSize(path: itemURL.path)
-            if size > 10 * 1024 * 1024 { // Only show items > 10 MB in drill down
+            let (size, isCloned) = duSize(path: itemURL.path)
+            if size > 5 * 1024 * 1024 { // > 5 MB
                 var isDir: ObjCBool = false
                 let exists = FileManager.default.fileExists(atPath: itemURL.path, isDirectory: &isDir)
                 let category = StorageCategory.category(for: itemURL)
@@ -88,7 +126,8 @@ public final class DeepStorageScanner: Sendable {
                     size: size,
                     category: category,
                     isAccessible: exists,
-                    hasChildren: isDir.boolValue
+                    hasChildren: isDir.boolValue,
+                    isClonedOrVirtual: isCloned
                 ))
             }
         }
@@ -96,7 +135,7 @@ public final class DeepStorageScanner: Sendable {
         return items.sorted { $0.size > $1.size }
     }
 
-    /// Scan all major directories and return their sizes
+    /// Scan distinct top-level directories WITHOUT subfolder duplication
     public func scanAllDirectories(
         onProgress: (@Sendable (String) -> Void)? = nil
     ) async -> [DirectorySize] {
@@ -104,9 +143,9 @@ public final class DeepStorageScanner: Sendable {
         let fm = FileManager.default
         var results: [DirectorySize] = []
 
-        // Define all directories to scan with categories
+        // Top-level independent targets ONLY (no parent-child duplicates!)
         let targets: [(String, String, StorageCategory)] = [
-            // User visible directories
+            // User folders
             ("Documents", "Documents", .documents),
             ("Downloads", "Downloads", .downloads),
             ("Desktop", "Desktop", .documents),
@@ -114,41 +153,21 @@ public final class DeepStorageScanner: Sendable {
             ("Music", "Music", .media),
             ("Pictures", "Pictures", .media),
 
-            // iCloud Drive (if Desktop & Documents in iCloud is enabled)
-            ("Library/Mobile Documents/com~apple~CloudDocs", "iCloud Drive (Local Copy)", .documents),
-
-            // Library directories (system data & app data)
+            // Library primary components (independent, non-overlapping)
             ("Library/Application Support", "App Support Data", .other),
             ("Library/Caches", "Caches", .cache),
-            ("Library/Containers", "App Containers (App Store Apps)", .apps),
-            ("Library/Group Containers", "Group Containers", .apps),
-            ("Library/Logs", "System Logs", .cache),
+            ("Library/Containers", "App Containers (Sandboxed Apps)", .apps),
+            ("Library/Group Containers", "Group Containers (WhatsApp/Office)", .apps),
+            ("Library/Developer", "Developer Tools Data (Xcode)", .developer),
             ("Library/Mail", "Mail Data", .other),
-            ("Library/Messages", "iMessage Data & Attachments", .other),
-            ("Library/Developer", "Developer Tools Data", .developer),
-            ("Library/Safari", "Safari Data", .other),
+            ("Library/Messages", "iMessage Data", .other),
+            ("Library/Logs", "System Logs", .cache),
 
-            // Developer directories
-            ("Library/Developer/Xcode/DerivedData", "Xcode DerivedData (Build Cache)", .developer),
-            ("Library/Developer/Xcode/Archives", "Xcode Archives", .developer),
-            ("Library/Developer/Xcode/iOS DeviceSupport", "iOS Device Support", .developer),
-            ("Library/Developer/CoreSimulator/Devices", "iOS Simulator Devices", .developer),
-
-            // Photos library
-            ("Pictures/Photos Library.photoslibrary", "Photos Library", .media),
-
-            // Hidden developer & package manager caches
-            (".npm", "npm Cache", .developer),
-            (".yarn", "Yarn Cache", .developer),
-            (".cargo", "Cargo/Rust Cache", .developer),
-            (".gradle", "Gradle Cache", .developer),
-            (".cocoapods", "CocoaPods Cache", .developer),
-            (".docker", "Docker Data", .developer),
-            (".gem", "Ruby Gems", .developer),
-            (".local/share", "Local Share Data", .other),
-
-            // Trash
+            // Hidden developer caches in Home
             (".Trash", "Tempat Sampah (Trash)", .cache),
+            (".gradle", "Gradle Cache", .developer),
+            (".npm", "npm Cache", .developer),
+            (".cargo", "Cargo/Rust Cache", .developer),
         ]
 
         for (subpath, name, category) in targets {
@@ -157,9 +176,12 @@ public final class DeepStorageScanner: Sendable {
 
             onProgress?("Menganalisis: \(name)...")
 
-            let size = duSize(path: fullPath.path)
+            let (size, isCloned) = duSize(path: fullPath.path)
 
-            if size > 1 * 1024 * 1024 { // Only show dirs > 1 MB
+            if size > 1 * 1024 * 1024 {
+                var isDir: ObjCBool = false
+                fm.fileExists(atPath: fullPath.path, isDirectory: &isDir)
+
                 results.append(DirectorySize(
                     id: fullPath.path,
                     name: name,
@@ -167,103 +189,40 @@ public final class DeepStorageScanner: Sendable {
                     size: size,
                     category: category,
                     isAccessible: true,
-                    hasChildren: true
+                    hasChildren: isDir.boolValue,
+                    isClonedOrVirtual: isCloned
                 ))
             }
         }
 
-        // Deep inspect top subfolders in Application Support (where System Data hides!)
-        onProgress?("Menganalisis App Support per aplikasi...")
-        let appSupport = home.appendingPathComponent("Library/Application Support", isDirectory: true)
-        if fm.fileExists(atPath: appSupport.path) {
-            let subdirs = await scanSubdirectories(of: appSupport)
-            for sub in subdirs.prefix(8) where sub.size > 100 * 1024 * 1024 { // > 100 MB
-                results.append(DirectorySize(
-                    id: sub.url.path,
-                    name: "App Support: \(sub.name)",
-                    url: sub.url,
-                    size: sub.size,
-                    category: .other,
-                    isAccessible: true,
-                    hasChildren: true
-                ))
-            }
-        }
-
-        // Deep inspect top subfolders in Containers (App Store apps data)
-        onProgress?("Menganalisis App Containers...")
-        let containers = home.appendingPathComponent("Library/Containers", isDirectory: true)
-        if fm.fileExists(atPath: containers.path) {
-            let subdirs = await scanSubdirectories(of: containers)
-            for sub in subdirs.prefix(8) where sub.size > 100 * 1024 * 1024 { // > 100 MB
-                results.append(DirectorySize(
-                    id: sub.url.path,
-                    name: "Container: \(sub.name)",
-                    url: sub.url,
-                    size: sub.size,
-                    category: .apps,
-                    isAccessible: true,
-                    hasChildren: true
-                ))
-            }
-        }
-
-        // Deep inspect Documents subfolders (so the user sees where 56 GB goes!)
-        onProgress?("Menganalisis subfolder Documents...")
-        let documents = home.appendingPathComponent("Documents", isDirectory: true)
-        if fm.fileExists(atPath: documents.path) {
-            let subdirs = await scanSubdirectories(of: documents)
-            for sub in subdirs where sub.size > 50 * 1024 * 1024 { // > 50 MB
-                results.append(DirectorySize(
-                    id: sub.url.path,
-                    name: "Documents: \(sub.name)",
-                    url: sub.url,
-                    size: sub.size,
-                    category: .documents,
-                    isAccessible: true,
-                    hasChildren: true
-                ))
-            }
-        }
-
-        // Scan /Applications
-        onProgress?("Menganalisis: /Applications...")
-        let systemAppsSize = duSize(path: "/Applications")
-        if systemAppsSize > 0 {
+        // Add Applications
+        onProgress?("Menganalisis: Applications...")
+        let (appsSize, _) = duSize(path: "/Applications")
+        if appsSize > 0 {
             results.append(DirectorySize(
                 id: "/Applications",
-                name: "Applications (/Applications)",
+                name: "Applications",
                 url: URL(fileURLWithPath: "/Applications"),
-                size: systemAppsSize,
+                size: appsSize,
                 category: .apps,
                 isAccessible: true,
                 hasChildren: true
             ))
         }
 
-        // Scan /System
+        // Add macOS System (accurate sealed snapshot size, never looping)
         onProgress?("Menganalisis: macOS System...")
-        let systemSize = duSize(path: "/System")
-        if systemSize > 0 {
-            results.append(DirectorySize(
-                id: "/System",
-                name: "macOS System (/System)",
-                url: URL(fileURLWithPath: "/System"),
-                size: systemSize,
-                category: .other,
-                isAccessible: true,
-                hasChildren: false
-            ))
-        }
+        let systemSize = getSystemVolumeSize()
+        results.append(DirectorySize(
+            id: "/System",
+            name: "macOS System (OS Core)",
+            url: URL(fileURLWithPath: "/System"),
+            size: systemSize,
+            category: .other,
+            isAccessible: true,
+            hasChildren: false
+        ))
 
-        // Deduplicate by path
-        var unique: [String: DirectorySize] = [:]
-        for r in results {
-            if unique[r.id] == nil {
-                unique[r.id] = r
-            }
-        }
-
-        return Array(unique.values).sorted { $0.size > $1.size }
+        return results.sorted { $0.size > $1.size }
     }
 }

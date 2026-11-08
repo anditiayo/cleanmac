@@ -44,12 +44,45 @@ public struct DirectorySizesView: View {
     public var body: some View {
         VStack(spacing: 0) {
             // Header Bar
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Navigation Bar with Back Button
+                HStack(spacing: 12) {
+                    if navigationStack.isEmpty {
+                        // Button Back to Dashboard
+                        Button {
+                            viewModel.selectedTab = .dashboard
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                Text("Dashboard")
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.regular)
+                    } else {
+                        // Button Back to previous folder / root
+                        Button {
+                            navigationStack.removeLast()
+                            if let previous = navigationStack.last {
+                                loadFolder(previous)
+                            } else {
+                                currentSubitems = []
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                Text(navigationStack.count > 1 ? navigationStack[navigationStack.count - 2].name : "Semua Folder")
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.regular)
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(navigationStack.isEmpty ? "Analisis Semua Folder & System Data" : navigationStack.last!.name)
                             .font(.title2)
                             .fontWeight(.bold)
+                            .lineLimit(1)
                         Text("Total terdeteksi: \(ByteFormatter.string(from: totalSizeDisplayed)) • \(currentItems.count) item")
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -89,27 +122,14 @@ public struct DirectorySizesView: View {
                     .cornerRadius(8)
                 }
 
-                // Breadcrumb / Back button when drilled down
+                // Breadcrumb path when drilled down
                 if !navigationStack.isEmpty {
                     HStack(spacing: 6) {
-                        Button {
-                            navigationStack.removeLast()
-                            if let previous = navigationStack.last {
-                                loadFolder(previous)
-                            } else {
-                                currentSubitems = []
-                            }
-                        } label: {
-                            Label("Kembali", systemImage: "chevron.left")
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-
-                        Text("Lokasi:")
+                        Image(systemName: "folder")
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                        Button("Utama") {
+                        Button("Semua Folder") {
                             navigationStack.removeAll()
                             currentSubitems = []
                         }
@@ -127,7 +147,7 @@ public struct DirectorySizesView: View {
                                 .foregroundColor(index == navigationStack.count - 1 ? .primary : .blue)
                         }
                     }
-                    .padding(.top, 2)
+                    .padding(.horizontal, 4)
                 }
             }
             .padding()
@@ -178,6 +198,17 @@ public struct DirectorySizesView: View {
                                     .background(dir.category.color.opacity(0.15))
                                     .foregroundColor(dir.category.color)
                                     .cornerRadius(4)
+
+                                if dir.isClonedOrVirtual {
+                                    Text("APFS Clone")
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.purple.opacity(0.15))
+                                        .foregroundColor(.purple)
+                                        .cornerRadius(4)
+                                        .help("File ini merupakan clone Copy-on-Write APFS yang membagikan blok fisik yang sama di disk")
+                                }
                             }
 
                             Text(dir.url.path)

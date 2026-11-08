@@ -13,7 +13,18 @@ public struct JunkCleanerView: View {
         VStack(spacing: 0) {
             // Top Summary Bar
             VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .center) {
+                HStack(alignment: .center, spacing: 12) {
+                    Button {
+                        viewModel.selectedTab = .dashboard
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                            Text("Dashboard")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.regular)
+
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Pembersih File Aman Dihapus")
                             .font(.title2)

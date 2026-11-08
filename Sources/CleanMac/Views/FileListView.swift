@@ -32,12 +32,23 @@ public struct FileListView: View {
     public var body: some View {
         VStack(spacing: 0) {
             // Header bar
-            HStack {
+            HStack(spacing: 12) {
+                Button {
+                    viewModel.selectedTab = .dashboard
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Dashboard")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text("File & Folder Besar")
                         .font(.title2)
                         .fontWeight(.bold)
-                    Text("Ditemukan \(viewModel.largeFiles.count) file besar (>50 MB) • Total: \(ByteFormatter.string(from: viewModel.totalLargeFilesSize))")
+                    Text("Ditemukan \(viewModel.largeFiles.count) file besar (>10 MB) • Total: \(ByteFormatter.string(from: viewModel.totalLargeFilesSize))")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
