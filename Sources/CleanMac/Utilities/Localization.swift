@@ -35,6 +35,8 @@ public final class LocalizationManager: ObservableObject {
         case "sysdata.containersDesc": return isId ? "Container sandbox terisolasi untuk aplikasi dari Mac App Store" : "Isolated sandbox containers for Mac App Store applications"
         case "sysdata.snapshots": return isId ? "APFS Local Snapshots (macOS Update)" : "APFS Local Snapshots (macOS Update)"
         case "sysdata.snapshotsDesc": return isId ? "Cadangan pemulihan lokal otomatis sebelum macOS update & Time Machine" : "Automatic local recovery snapshots created before macOS updates & Time Machine"
+        case "sysdata.sysCaches": return isId ? "Cache Sistem, Daemon & Logs" : "System Caches, Daemons & Logs"
+        case "sysdata.sysCachesDesc": return isId ? "Cache sementara sistem operasi di /private/var/folders dan daemon" : "Temporary OS caches in /private/var/folders and daemon logs"
         case "sysdata.vmSwap": return isId ? "Sleepimage & Virtual Memory (Swap)" : "Sleepimage & Virtual Memory (Swap)"
         case "sysdata.vmSwapDesc": return isId ? "Memori virtual disk swap & RAM snapshot saat Mac hibernasi" : "Virtual memory disk swap & RAM state saved when Mac sleeps"
         case "sysdata.residual": return isId ? "Sisa File Sistem & Firmlinks macOS" : "Remaining macOS System Files & Firmlinks"

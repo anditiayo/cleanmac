@@ -175,6 +175,35 @@ public final class DeepStorageScanner: Sendable {
             (".cargo", "Cargo/Rust Cache", .developer),
         ]
 
+        // Automatically discover other user folders in Home (e.g. Kerja, Yuasa, Projects)
+        if let homeItems = try? fm.contentsOfDirectory(at: home, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles]) {
+            let standardNames: Set<String> = [
+                "Documents", "Downloads", "Desktop", "Movies", "Music", "Pictures",
+                "Library", "Public", "Applications"
+            ]
+            for item in homeItems {
+                let folderName = item.lastPathComponent
+                if !standardNames.contains(folderName) {
+                    var isDir: ObjCBool = false
+                    if fm.fileExists(atPath: item.path, isDirectory: &isDir), isDir.boolValue {
+                        let (size, isCloned) = duSize(path: item.path)
+                        if size > 5 * 1024 * 1024 { // > 5 MB
+                            results.append(DirectorySize(
+                                id: item.path,
+                                name: folderName,
+                                url: item,
+                                size: size,
+                                category: .documents,
+                                isAccessible: true,
+                                hasChildren: true,
+                                isClonedOrVirtual: isCloned
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+
         for (subpath, name, category) in targets {
             let fullPath = home.appendingPathComponent(subpath)
             guard fm.fileExists(atPath: fullPath.path) else { continue }
@@ -223,7 +252,7 @@ public final class DeepStorageScanner: Sendable {
             name: "macOS System (OS Core)",
             url: URL(fileURLWithPath: "/System"),
             size: systemSize,
-            category: .other,
+            category: .macos,
             isAccessible: true,
             hasChildren: false
         ))

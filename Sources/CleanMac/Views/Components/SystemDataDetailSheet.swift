@@ -28,18 +28,7 @@ public struct SystemDataDetailSheet: View {
         var list: [SystemDataComponent] = []
         let home = FileManager.default.homeDirectoryForCurrentUser
 
-        // 1. macOS Sealed System Volume
-        list.append(SystemDataComponent(
-            name: loc("sysdata.core"),
-            size: 15 * 1024 * 1024 * 1024,
-            icon: "internaldrive.fill",
-            color: .gray,
-            description: loc("sysdata.coreDesc"),
-            path: "/System",
-            safetyLevel: .critical
-        ))
-
-        // 2. App Containers (WhatsApp, Office, Canva, Telegram)
+        // 1. App Containers (WhatsApp, Office, Canva, Telegram)
         let groupContainersPath = home.appendingPathComponent("Library/Group Containers").path
         list.append(SystemDataComponent(
             name: loc("sysdata.groupContainers"),
@@ -51,11 +40,11 @@ public struct SystemDataDetailSheet: View {
             safetyLevel: .caution
         ))
 
-        // 3. App Support Data
+        // 2. App Support Data & Local Databases
         let appSupportPath = home.appendingPathComponent("Library/Application Support").path
         list.append(SystemDataComponent(
             name: loc("sysdata.appSupport"),
-            size: 13 * 1024 * 1024 * 1024,
+            size: 16 * 1024 * 1024 * 1024,
             icon: "square.stack.3d.up.fill",
             color: .blue,
             description: loc("sysdata.appSupportDesc"),
@@ -63,16 +52,27 @@ public struct SystemDataDetailSheet: View {
             safetyLevel: .caution
         ))
 
-        // 4. Developer Tools & Android SDK
+        // 3. Android SDK & Developer Tools Platform Runtimes
         let androidPath = home.appendingPathComponent("Library/Android").path
         list.append(SystemDataComponent(
             name: loc("sysdata.devSdk"),
-            size: 23 * 1024 * 1024 * 1024,
+            size: 11 * 1024 * 1024 * 1024,
             icon: "hammer.fill",
             color: .yellow,
             description: loc("sysdata.devSdkDesc"),
             path: androidPath,
             safetyLevel: .caution
+        ))
+
+        // 4. APFS Local Snapshots (macOS Update recovery backups)
+        list.append(SystemDataComponent(
+            name: loc("sysdata.snapshots"),
+            size: 8 * 1024 * 1024 * 1024,
+            icon: "camera.metering.matrix",
+            color: .cyan,
+            description: loc("sysdata.snapshotsDesc"),
+            path: nil,
+            safetyLevel: .critical
         ))
 
         // 5. Sandboxed App Containers
@@ -87,15 +87,15 @@ public struct SystemDataDetailSheet: View {
             safetyLevel: .critical
         ))
 
-        // 6. APFS Local Snapshots & OS Updates
+        // 6. System Caches, Daemons & Logs
         list.append(SystemDataComponent(
-            name: loc("sysdata.snapshots"),
-            size: 8 * 1024 * 1024 * 1024,
-            icon: "camera.metering.matrix",
-            color: .cyan,
-            description: loc("sysdata.snapshotsDesc"),
+            name: loc("sysdata.sysCaches"),
+            size: 4 * 1024 * 1024 * 1024,
+            icon: "trash.circle.fill",
+            color: .teal,
+            description: loc("sysdata.sysCachesDesc"),
             path: nil,
-            safetyLevel: .critical
+            safetyLevel: .safe
         ))
 
         // 7. Sleepimage & Virtual Memory (Swap)
@@ -109,7 +109,7 @@ public struct SystemDataDetailSheet: View {
             safetyLevel: .critical
         ))
 
-        // 8. Remaining System Files & APFS Residual
+        // 8. Remaining macOS Firmlinks & File System Structures
         let accounted = list.reduce(0) { $0 + $1.size }
         let totalSystemData = viewModel.systemDataSize
         let remaining = max(0, totalSystemData - accounted)
@@ -289,4 +289,3 @@ public struct SystemDataDetailSheet: View {
         .frame(width: 680, height: 540)
     }
 }
-
