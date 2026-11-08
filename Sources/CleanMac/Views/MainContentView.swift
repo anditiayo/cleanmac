@@ -22,6 +22,7 @@ public struct MainContentView: View {
                 List(NavigationTab.allCases, selection: $viewModel.selectedTab) { tab in
                     NavigationLink(value: tab) {
                         Label(tab.localizedTitle(for: selectedLanguage), systemImage: tab.iconName)
+                            .font(.system(size: 13, weight: .medium))
                     }
                 }
                 .listStyle(.sidebar)
@@ -32,17 +33,17 @@ public struct MainContentView: View {
                 VStack(spacing: 10) {
                     // Language Switcher Row
                     HStack(spacing: 8) {
-                        Label {
-                            Text(loc("footer.language"))
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.secondary)
-                        } icon: {
-                            Image(systemName: "globe")
-                                .font(.system(size: 11))
-                                .foregroundColor(.blue)
-                        }
+                        Image(systemName: "globe")
+                            .font(.system(size: 12))
+                            .foregroundColor(.blue)
+                            .frame(width: 16)
 
-                        Spacer()
+                        Text(loc("footer.language"))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.primary)
+                            .fixedSize()
+
+                        Spacer(minLength: 10)
 
                         Picker("", selection: $selectedLanguageRaw) {
                             ForEach(AppLanguage.allCases) { lang in
@@ -53,22 +54,22 @@ public struct MainContentView: View {
                         .labelsHidden()
                         .pickerStyle(.segmented)
                         .controlSize(.small)
-                        .frame(width: 96)
+                        .frame(width: 104)
                     }
 
                     // Theme Switcher Row
                     HStack(spacing: 8) {
-                        Label {
-                            Text(loc("footer.theme"))
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.secondary)
-                        } icon: {
-                            Image(systemName: "circle.lefthalf.filled")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                        }
+                        Image(systemName: "circle.lefthalf.filled")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .frame(width: 16)
 
-                        Spacer()
+                        Text(loc("footer.theme"))
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.primary)
+                            .fixedSize()
+
+                        Spacer(minLength: 10)
 
                         Picker("", selection: $selectedThemeRaw) {
                             ForEach(AppTheme.allCases) { theme in
@@ -78,7 +79,7 @@ public struct MainContentView: View {
                         .labelsHidden()
                         .pickerStyle(.segmented)
                         .controlSize(.small)
-                        .frame(width: 96)
+                        .frame(width: 104)
                     }
 
                     Divider()
@@ -88,34 +89,33 @@ public struct MainContentView: View {
                     Button {
                         showAboutSheet = true
                     } label: {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 7) {
                             Image(systemName: "info.circle.fill")
-                                .font(.system(size: 11))
+                                .font(.system(size: 12))
                                 .foregroundColor(.blue)
                             Text(loc("footer.about"))
-                                .font(.system(size: 10.5, weight: .medium))
-                                .foregroundColor(.primary.opacity(0.85))
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.primary.opacity(0.9))
                                 .lineLimit(1)
-                                .truncationMode(.tail)
                             Spacer()
                         }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 5)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
                         .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(nsColor: .controlBackgroundColor).opacity(0.6))
+                            RoundedRectangle(cornerRadius: 7)
+                                .fill(Color(nsColor: .controlBackgroundColor).opacity(0.7))
                         )
                         .overlay(
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: 7)
                                 .stroke(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 0.5)
                         )
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(12)
+                .padding(14)
                 .background(Color(nsColor: .controlBackgroundColor).opacity(0.4))
             }
-            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
+            .navigationSplitViewColumnWidth(min: 240, ideal: 265, max: 320)
         } detail: {
             Group {
                 switch viewModel.selectedTab {
@@ -133,7 +133,7 @@ public struct MainContentView: View {
                     CacheListView(viewModel: viewModel)
                 }
             }
-            .id(selectedLanguageRaw) // Forces full UI refresh on language change!
+            .id(selectedLanguageRaw)
             .frame(minWidth: 640, minHeight: 480)
         }
         .preferredColorScheme(selectedTheme.colorScheme)
