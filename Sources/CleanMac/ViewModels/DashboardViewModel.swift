@@ -143,7 +143,12 @@ public final class DashboardViewModel: ObservableObject {
     }
 
     public var totalDirectorySizesScanned: Int64 {
-        directorySizes.reduce(0) { $0 + $1.size }
+        min(directorySizes.reduce(0) { $0 + $1.size }, diskInfo.usedSpace > 0 ? diskInfo.usedSpace : 250 * 1024 * 1024 * 1024)
+    }
+
+    public var systemDataSize: Int64 {
+        let known = totalAppsSize + totalCachesSize + totalLargeFilesSize
+        return max(0, diskInfo.usedSpace - known)
     }
 
     public func toggleCleanableSelection(id: String) {
@@ -188,20 +193,29 @@ public final class DashboardViewModel: ObservableObject {
         currentStatus = "Berhasil menghapus \(count) item sampah!"
     }
 
-    // Use deep scanner data for category breakdown (much more accurate)
+    // Accurate category usage calculation matching macOS Settings
     public var categoryUsages: [CategoryUsage] {
         var map: [StorageCategory: Int64] = [:]
 
+        // 1. Applications is strictly the apps installed
+        map[.apps] = totalAppsSize
+
+        // 2. Cache
+        map[.cache] = totalCachesSize
+
+        // 3. Collect specific categories (developer, documents, media, downloads)
         for dir in directorySizes {
-            map[dir.category, default: 0] += dir.size
+            if dir.category != .apps && dir.category != .other {
+                map[dir.category, default: 0] += dir.size
+            }
         }
 
-        // Fallback to old method if deep scan hasn't run
-        if map.isEmpty {
-            map[.apps] = totalAppsSize
-            map[.cache] = totalCachesSize
-            for file in largeFiles {
-                map[file.category, default: 0] += file.size
+        // 4. In macOS, System Data & Other represents the remaining used physical disk space
+        if diskInfo.usedSpace > 0 {
+            let knownUsed = map.values.reduce(0, +)
+            let systemData = max(0, diskInfo.usedSpace - knownUsed)
+            if systemData > 0 {
+                map[.other] = systemData
             }
         }
 

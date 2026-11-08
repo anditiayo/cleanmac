@@ -2,18 +2,44 @@ import SwiftUI
 
 public struct MainContentView: View {
     @StateObject private var viewModel = DashboardViewModel()
+    @AppStorage("appTheme") private var selectedThemeRaw: String = AppTheme.system.rawValue
+
+    private var selectedTheme: AppTheme {
+        AppTheme(rawValue: selectedThemeRaw) ?? .system
+    }
 
     public init() {}
 
     public var body: some View {
         NavigationSplitView {
-            List(NavigationTab.allCases, selection: $viewModel.selectedTab) { tab in
-                NavigationLink(value: tab) {
-                    Label(tab.rawValue, systemImage: tab.iconName)
+            VStack(spacing: 0) {
+                List(NavigationTab.allCases, selection: $viewModel.selectedTab) { tab in
+                    NavigationLink(value: tab) {
+                        Label(tab.rawValue, systemImage: tab.iconName)
+                    }
                 }
+                .listStyle(.sidebar)
+
+                Divider()
+
+                // Theme Switcher Footer in Sidebar
+                HStack(spacing: 8) {
+                    Text("Tema:")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+
+                    Picker("Tema", selection: $selectedThemeRaw) {
+                        ForEach(AppTheme.allCases) { theme in
+                            Image(systemName: theme.iconName).tag(theme.rawValue)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .controlSize(.small)
+                }
+                .padding(10)
+                .background(Color(nsColor: .controlBackgroundColor).opacity(0.5))
             }
-            .listStyle(.sidebar)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 240)
+            .navigationSplitViewColumnWidth(min: 190, ideal: 210, max: 250)
         } detail: {
             Group {
                 switch viewModel.selectedTab {
@@ -31,11 +57,11 @@ public struct MainContentView: View {
                     CacheListView(viewModel: viewModel)
                 }
             }
-            .frame(minWidth: 600, minHeight: 450)
+            .frame(minWidth: 620, minHeight: 460)
         }
+        .preferredColorScheme(selectedTheme.colorScheme)
         .onAppear {
             viewModel.refreshDiskInfo()
         }
     }
 }
-

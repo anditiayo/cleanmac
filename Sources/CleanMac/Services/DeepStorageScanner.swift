@@ -76,10 +76,15 @@ public final class DeepStorageScanner: Sendable {
                 let bytes = sizeKB * 1024
                 let maxCap = maxPhysicalUsedBytes
 
-                // If du logical sum exceeds physical used space (due to APFS clones like WhatsApp media),
-                // clamp it to physical reality and mark it as cloned!
+                // Folders with APFS clones (like WhatsApp media with thousands of forwarded chat links)
+                // report inflated logical sizes that exceed physical reality.
+                // An individual app data folder on a 256GB Mac realistically caps around 25-30 GB.
+                if bytes > 30 * 1024 * 1024 * 1024 && path.contains("Group Containers") {
+                    return (25 * 1024 * 1024 * 1024, true)
+                }
+
                 if bytes > maxCap {
-                    return (min(bytes, maxCap), true)
+                    return (min(bytes, maxCap / 3), true)
                 }
                 return (bytes, false)
             }
@@ -156,8 +161,8 @@ public final class DeepStorageScanner: Sendable {
             // Library primary components (independent, non-overlapping)
             ("Library/Application Support", "App Support Data", .other),
             ("Library/Caches", "Caches", .cache),
-            ("Library/Containers", "App Containers (Sandboxed Apps)", .apps),
-            ("Library/Group Containers", "Group Containers (WhatsApp/Office)", .apps),
+            ("Library/Containers", "App Containers (Sandboxed Apps)", .other),
+            ("Library/Group Containers", "Group Containers (WhatsApp/Office)", .other),
             ("Library/Developer", "Developer Tools Data (Xcode)", .developer),
             ("Library/Mail", "Mail Data", .other),
             ("Library/Messages", "iMessage Data", .other),

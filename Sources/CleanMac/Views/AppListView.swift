@@ -4,8 +4,7 @@ public struct AppListView: View {
     @ObservedObject var viewModel: DashboardViewModel
     @State private var searchText: String = ""
     @State private var sortAscending: Bool = false
-    @State private var appToTrash: AppInfo? = nil
-    @State private var showTrashConfirm: Bool = false
+    @State private var appToUninstall: AppInfo? = nil
 
     public init(viewModel: DashboardViewModel) {
         self.viewModel = viewModel
@@ -125,30 +124,22 @@ public struct AppListView: View {
                         .buttonStyle(.borderless)
 
                         Button(role: .destructive) {
-                            appToTrash = app
-                            showTrashConfirm = true
+                            appToUninstall = app
                         } label: {
                             Image(systemName: "trash")
-                                .foregroundColor(.red.opacity(0.8))
+                                .foregroundColor(.red.opacity(0.85))
                         }
-                        .help("Hapus Aplikasi (Pindahkan ke Trash)")
+                        .help("Uninstall Tuntas (Hapus Aplikasi & Semua Data Terkait)")
                         .buttonStyle(.borderless)
                     }
                     .padding(.vertical, 4)
                 }
                 .listStyle(.inset)
-                .confirmationDialog(
-                    "Hapus Aplikasi?",
-                    isPresented: $showTrashConfirm,
-                    titleVisibility: .visible,
-                    presenting: appToTrash
-                ) { app in
-                    Button("Pindahkan ke Trash (\(app.formattedSize))", role: .destructive) {
-                        _ = viewModel.moveToTrash(url: app.url)
+                .sheet(item: $appToUninstall) { targetApp in
+                    AppUninstallerSheet(app: targetApp) {
+                        viewModel.applications.removeAll { $0.id == targetApp.id }
+                        viewModel.refreshDiskInfo()
                     }
-                    Button("Batal", role: .cancel) {}
-                } message: { app in
-                    Text("Aplikasi '\(app.name)' akan dipindahkan ke Trash. Anda tetap dapat mengembalikannya dari Trash sebelum dikosongkan.")
                 }
             }
         }

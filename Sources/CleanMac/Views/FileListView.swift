@@ -8,6 +8,8 @@ public struct FileListView: View {
 
     @State private var itemToTrash: FileInfo? = nil
     @State private var showTrashConfirm: Bool = false
+    @State private var selectedFileForPreview: FileInfo? = nil
+    @State private var selectedFileID: String? = nil
 
     public init(viewModel: DashboardViewModel) {
         self.viewModel = viewModel
@@ -142,6 +144,15 @@ public struct FileListView: View {
                             .fontWeight(.semibold)
 
                         Button {
+                            selectedFileForPreview = file
+                        } label: {
+                            Image(systemName: "eye")
+                                .foregroundColor(.blue)
+                        }
+                        .help("Quick Look / Pratinjau (Spasi)")
+                        .buttonStyle(.borderless)
+
+                        Button {
                             viewModel.revealInFinder(url: file.url)
                         } label: {
                             Image(systemName: "folder.badge.gearshape")
@@ -175,6 +186,22 @@ public struct FileListView: View {
                 } message: { item in
                     Text("Apakah Anda yakin ingin memindahkan '\(item.name)' ke Trash?")
                 }
+                .sheet(item: $selectedFileForPreview) { targetFile in
+                    FileDetailSheet(file: targetFile) {
+                        _ = viewModel.moveToTrash(url: targetFile.url)
+                    } onReveal: {
+                        viewModel.revealInFinder(url: targetFile.url)
+                    }
+                }
+                .background(
+                    Button("") {
+                        if let first = filteredFiles.first {
+                            selectedFileForPreview = first
+                        }
+                    }
+                    .keyboardShortcut(.space, modifiers: [])
+                    .opacity(0)
+                )
             }
         }
     }

@@ -5,60 +5,125 @@
 <h1 align="center">CleanMac</h1>
 
 <p align="center">
-  <b>Aplikasi macOS native (SwiftUI) modern untuk menganalisis penyimpanan disk, mendeteksi aplikasi & data berukuran besar, dan membersihkan file sampah sistem.</b>
+  <b>Modern Native macOS Storage Analyzer, Deep System Cleaner & App Uninstaller</b><br>
+  <i>Aplikasi Analisis Penyimpanan, Pembersih Sistem Mendalam & Uninstaller Tuntas untuk macOS</i>
+</p>
+
+<p align="center">
+  <a href="#-english"><b>English 🇬🇧</b></a> | <a href="#-bahasa-indonesia"><b>Bahasa Indonesia 🇮🇩</b></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-macOS%2013%2B-blue?logo=apple" alt="macOS" />
+  <img src="https://img.shields.io/badge/Swift-5.9%20%7C%206.0-orange?logo=swift" alt="Swift" />
+  <img src="https://img.shields.io/badge/UI-SwiftUI%20%2B%20Swift%20Charts-indigo" alt="SwiftUI" />
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
 </p>
 
 ---
 
-## ✨ Fitur Utama
+<a name="-english"></a>
+## 🇬🇧 English
 
-- 💾 **Storage Overview Real-time**: Menampilkan kapasitas total disk, ruang terpakai (*used*), dan ruang kosong (*free*) secara akurat.
-- 📂 **Analisis Semua Folder (System Data & User)**:
-  - Memindai folder utama sistem dan pengguna termasuk `Application Support`, `Containers`, `Developer`, `iCloud Drive`, dll.
-  - **Eksplorasi Subfolder (Drill-Down)**: Klik tanda panah `>` pada folder apa pun untuk melihat rincian subfolder mana di dalamnya yang paling memakan tempat.
-- 📦 **Deteksi Aplikasi Besar**: Memindai direktori `/Applications` dan `~/Applications`, menghitung ukuran bundle sebenarnya secara rekursif, dan menampilkan ikon aplikasi asli macOS.
-- 📁 **Deteksi File & Folder Data Besar**: Memindai folder `Downloads`, `Documents`, `Desktop`, `Movies`, dll. untuk file/folder berukuran besar (>10 MB), termasuk direktori developer seperti `node_modules`, `build`, dan `.gradle`.
-- 🧹 **Pembersih Sampah (Junk Cleaner)**:
-  - Cache aplikasi (`~/Library/Caches`)
-  - Log sistem lama (`~/Library/Logs`)
-  - Xcode DerivedData build cache
-  - Installer bekas (`.dmg` / `.pkg`)
-  - Tempat sampah (`.Trash`)
-  - Cache package manager (`.npm`, `.cargo`, dll)
-  - Fitur **Checkbox & Hapus Yang Dipilih** sekaligus atau satuan.
-- 🗑️ **Penghapusan Aman (Move to Trash)**: Setiap file/folder/aplikasi dapat dipindahkan ke Trash langsung dari aplikasi dengan dialog konfirmasi keamanan.
-- 📊 **Visualisasi Kategori**: Menggunakan **Swift Charts** native untuk menampilkan distribusi penyimpanan berdasarkan kategori.
-- 🔍 **Pencarian & Filter Cepat**: Filter berdasarkan kategori dan pencarian instan nama file/aplikasi.
+**CleanMac** is a lightweight, high-performance native macOS utility designed to help you reclaim disk space, find hidden storage hogs, preview large files, and completely uninstall applications along with their hidden library leftovers.
 
----
+### 🌟 Key Features
 
-## 🛠️ Tech Stack
+- 💾 **Real-Time Storage Overview**:
+  - Instant live breakdown of your disk: Used, Free, and Total capacity.
+  - Interactive **Swift Charts** showing usage distributed across Applications, System Data, Documents, Media, Developer caches, and Logs.
+- 📦 **Complete Application Uninstaller**:
+  - Don't just delete the `.app` bundle! CleanMac scans `~/Library/Application Support`, `~/Library/Caches`, `~/Library/Preferences`, and sandbox containers to completely remove all hidden leftover files in one click.
+- 📂 **Deep System Data & Subfolder Drill-Down**:
+  - Accurately measures hidden macOS System Data without falling into APFS firmlink loops.
+  - **Subfolder Drill-Down**: Click `>` on any folder (e.g. `Documents` or `App Support`) to explore its largest subdirectories interactively.
+- ⚡ **Spacebar Quick Look Preview**:
+  - Select any file and tap **Spacebar** or click the preview button to inspect file details, dimensions, and path instantly.
+- 🌓 **Dark & Light Theme Support**:
+  - Seamless toggle between System Auto, Dark Mode, and Light Mode directly from the sidebar.
+- 🧹 **One-Click Junk Cleaner**:
+  - Safely sweeps app caches, old diagnostic logs, Xcode `DerivedData` build caches, developer package caches (`npm`, `cargo`, `gradle`), and leftover `.dmg` installers.
+- 🛡️ **Safe Move to Trash**:
+  - No accidental permanent deletions. Every action confirms and safely routes items to macOS Trash.
 
-- **Bahasa**: Swift 5.9+ / Swift 6
-- **UI Framework**: SwiftUI + Swift Charts
-- **Platform**: macOS 13.0+ (Ventura, Sonoma, Sequoia)
-- **Build System**: Swift Package Manager (SPM) tanpa dependensi pihak ketiga
+### 🚀 Getting Started
 
----
+#### Option 1: Download Pre-built DMG
+Download the ready-to-run installer from the repository:
+```bash
+open CleanMac-Installer.dmg
+# Drag CleanMac into your /Applications folder
+```
 
-## 🚀 Cara Menjalankan
-
-### Cara 1: Menjalankan Script Otomatis
+#### Option 2: Build from Source (Swift Package Manager)
 ```bash
 git clone https://github.com/anditiayo/cleanmac.git
 cd cleanmac
-chmod +x run.sh
-./run.sh
-```
 
-### Cara 2: Build Manual
-```bash
-swift build -c release
-open CleanMac.app
+# Run the app
+./run.sh
+
+# Or build the DMG package
+./create_dmg.sh
 ```
 
 ---
 
-## 📄 Lisensi
+<a name="-bahasa-indonesia"></a>
+## 🇮🇩 Bahasa Indonesia
 
-MIT License © 2026 yogianditia
+**CleanMac** adalah aplikasi utilitas macOS native yang ringan, cepat, dan modern untuk menganalisis penyimpanan disk, mendeteksi aplikasi & data besar yang tersembunyi, serta membersihkan file sampah sistem dengan aman.
+
+### 🌟 Fitur Unggulan
+
+- 💾 **Ringkasan Storage Real-Time**:
+  - Menampilkan kapasitas disk terpakai, ruang kosong, dan total secara akurat.
+  - Visualisasi grafik batang interaktif menggunakan **Swift Charts** native untuk kategori Aplikasi, System Data, Dokumen, Media, Cache, dan Developer.
+- 📦 **Uninstaller Tuntas untuk Aplikasi**:
+  - Tidak hanya menghapus file `.app`! CleanMac memindai file sisa tersembunyi di `~/Library/Application Support`, `~/Library/Caches`, `~/Library/Preferences`, dan container untuk menghapus aplikasi beserta seluruh datanya secara bersih.
+- 📂 **Analisis Semua Folder & Eksplorasi Subfolder (Drill-Down)**:
+  - Menganalisis *System Data* dan folder sistem tanpa terkena jebakan perulangan *firmlink* macOS.
+  - **Drill-Down Subfolder**: Klik tanda panah `>` di folder mana saja (seperti `Documents` atau `App Support`) untuk melihat subfolder terdalam mana yang paling memakan tempat.
+- ⚡ **Pratinjau Cepat (Quick Look) dengan Tombol Spasi**:
+  - Cukup tekan tombol **Spasi** atau klik ikon mata pada file besar untuk membuka detail berkas dan pratinjau secara instan.
+- 🌓 **Dukungan Mode Gelap (Dark) & Terang (Light)**:
+  - Penggantian tema cepat (Sistem, Gelap, Terang) langsung dari sidebar aplikasi.
+- 🧹 **Pembersih Sampah Sekali Klik (Junk Cleaner)**:
+  - Membersihkan cache aplikasi, log sistem usang, build cache Xcode `DerivedData`, cache package manager (`npm`, `cargo`, `gradle`), dan installer bekas (`.dmg` / `.pkg`).
+- 🛡️ **Penghapusan Aman (Move to Trash)**:
+  - Setiap penghapusan dilengkapi dialog konfirmasi dan dipindahkan ke Trash macOS agar file tetap dapat dipulihkan jika diperlukan.
+
+### 🚀 Cara Install & Menjalankan
+
+#### Cara 1: Menggunakan File Installer DMG
+```bash
+open CleanMac-Installer.dmg
+# Tarik CleanMac ke folder Applications Anda
+```
+
+#### Cara 2: Kompilasi Manual dari Source Code
+```bash
+git clone https://github.com/anditiayo/cleanmac.git
+cd cleanmac
+
+# Jalankan langsung
+./run.sh
+
+# Atau buat file installer DMG
+./create_dmg.sh
+```
+
+---
+
+## 🛠️ Tech Stack & Requirements
+
+- **Bahasa**: Swift 5.9+ / Swift 6.0
+- **UI Framework**: SwiftUI + Swift Charts
+- **Sistem Operasi**: macOS 13.0+ (Ventura, Sonoma, Sequoia)
+- **Zero Third-Party Dependencies**: Murni 100% Apple Native API & Swift Package Manager.
+
+---
+
+## 📄 License
+
+Proyek ini dilisensikan di bawah [MIT License](LICENSE) © 2026 yogianditia.

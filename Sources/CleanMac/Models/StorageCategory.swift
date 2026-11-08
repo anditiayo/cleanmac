@@ -7,7 +7,7 @@ public enum StorageCategory: String, CaseIterable, Identifiable, Sendable {
     case downloads = "Downloads"
     case cache = "Caches & Logs"
     case developer = "Developer"
-    case other = "Other Files"
+    case other = "System Data & Other"
 
     public var id: String { rawValue }
 
