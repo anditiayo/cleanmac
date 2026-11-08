@@ -289,3 +289,4 @@ public struct SystemDataDetailSheet: View {
         .frame(width: 680, height: 540)
     }
 }
+

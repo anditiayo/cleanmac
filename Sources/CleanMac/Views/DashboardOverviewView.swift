@@ -111,40 +111,40 @@ public struct DashboardOverviewView: View {
 
                     StatCard(
                         title: loc("dash.cardApps"),
-                        value: ByteFormatter.string(from: viewModel.totalAppsSize),
+                        value: ByteFormatter.string(from: viewModel.displayAppsSize),
                         subtitle: "\(viewModel.applications.count) \(loc("stat.appsDetected"))",
                         icon: "app.badge.fill",
-                        color: .blue
+                        color: Color(red: 0.98, green: 0.58, blue: 0.16)
                     ) {
                         viewModel.selectedTab = .apps
                     }
 
                     StatCard(
-                        title: loc("dash.cardLargeFiles"),
-                        value: ByteFormatter.string(from: viewModel.totalLargeFilesSize),
+                        title: loc("cat.documents"),
+                        value: ByteFormatter.string(from: viewModel.displayDocumentsSize),
                         subtitle: "\(viewModel.largeFiles.count) \(loc("stat.filesDetected"))",
-                        icon: "doc.badge.gearshape.fill",
-                        color: .green
+                        icon: "doc.fill",
+                        color: Color(red: 0.95, green: 0.28, blue: 0.25)
                     ) {
                         viewModel.selectedTab = .files
                     }
 
                     StatCard(
-                        title: loc("dash.cardCaches"),
-                        value: ByteFormatter.string(from: viewModel.totalCachesSize),
-                        subtitle: "\(viewModel.cacheFiles.count) \(loc("stat.cacheFolders"))",
-                        icon: "trash.fill",
-                        color: .orange
+                        title: "macOS",
+                        value: ByteFormatter.string(from: viewModel.macOSSize),
+                        subtitle: loc("stat.macosSystem"),
+                        icon: "apple.logo",
+                        color: Color(red: 0.35, green: 0.35, blue: 0.38)
                     ) {
-                        viewModel.selectedTab = .caches
+                        showSystemDataSheet = true
                     }
 
                     StatCard(
                         title: loc("dash.cardSystemData"),
                         value: ByteFormatter.string(from: viewModel.systemDataSize),
-                        subtitle: loc("stat.macosSystem"),
+                        subtitle: loc("sysdata.inspectBtn"),
                         icon: "internaldrive.fill",
-                        color: .gray
+                        color: Color(red: 0.55, green: 0.55, blue: 0.58)
                     ) {
                         showSystemDataSheet = true
                     }
@@ -161,7 +161,7 @@ public struct DashboardOverviewView: View {
                         viewModel.selectedTab = .files
                     case .developer:
                         viewModel.selectedTab = .allFolders
-                    case .other:
+                    case .other, .macos:
                         showSystemDataSheet = true
                     }
                 }
