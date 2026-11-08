@@ -1,0 +1,20 @@
+name: Build CleanMac
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build CleanMac
+      run: |
+        swift --version
+        swift build -c release
