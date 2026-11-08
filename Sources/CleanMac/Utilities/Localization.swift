@@ -17,6 +17,31 @@ public final class LocalizationManager: ObservableObject {
         let isId = (language == .indonesian)
         switch key {
 
+        // ── System Data Breakdown ──
+        case "sysdata.title": return isId ? "Rincian System Data" : "System Data Breakdown"
+        case "sysdata.subtitle": return isId ? "Daftar komponen yang menyusun ruang abu-abu (System Data) di macOS" : "Components making up the gray System Data storage on macOS"
+        case "sysdata.explanation": return isId
+            ? "macOS mengelompokkan file core OS, container aplikasi, snapshot sistem, simulator pengembang, dan memori virtual ke dalam kategori 'System Data'."
+            : "macOS groups core OS files, app containers, system snapshots, developer simulators, and virtual memory into 'System Data'."
+        case "sysdata.core": return isId ? "macOS System OS (Core)" : "macOS System OS (Core)"
+        case "sysdata.coreDesc": return isId ? "Volume sistem tersegel (Sealed System Volume) berisi kernel & binary macOS" : "Sealed System Volume containing the macOS kernel & core system binaries"
+        case "sysdata.groupContainers": return isId ? "Group Containers (WhatsApp & Office)" : "Group Containers (WhatsApp & Office)"
+        case "sysdata.groupContainersDesc": return isId ? "Data chat WhatsApp, database MS Office, Canva, dan share extension" : "WhatsApp chat media, MS Office databases, Canva, and shared app extensions"
+        case "sysdata.appSupport": return isId ? "App Support & Database Lokal" : "App Support & Local Databases"
+        case "sysdata.appSupportDesc": return isId ? "Profile Chrome/Brave, Docker, data VS Code, dan database aplikasi lokal" : "Chrome/Brave profiles, Docker storage, VS Code data, and local app databases"
+        case "sysdata.devSdk": return isId ? "Android SDK & Developer Tools" : "Android SDK & Developer Tools"
+        case "sysdata.devSdkDesc": return isId ? "Android emulator platform, Xcode toolchains, dan SDK runtimes" : "Android emulator images, Xcode toolchains, and SDK platform runtimes"
+        case "sysdata.containers": return isId ? "App Containers (Sandboxed)" : "App Containers (Sandboxed)"
+        case "sysdata.containersDesc": return isId ? "Container sandbox terisolasi untuk aplikasi dari Mac App Store" : "Isolated sandbox containers for Mac App Store applications"
+        case "sysdata.snapshots": return isId ? "APFS Local Snapshots (macOS Update)" : "APFS Local Snapshots (macOS Update)"
+        case "sysdata.snapshotsDesc": return isId ? "Cadangan pemulihan lokal otomatis sebelum macOS update & Time Machine" : "Automatic local recovery snapshots created before macOS updates & Time Machine"
+        case "sysdata.vmSwap": return isId ? "Sleepimage & Virtual Memory (Swap)" : "Sleepimage & Virtual Memory (Swap)"
+        case "sysdata.vmSwapDesc": return isId ? "Memori virtual disk swap & RAM snapshot saat Mac hibernasi" : "Virtual memory disk swap & RAM state saved when Mac sleeps"
+        case "sysdata.residual": return isId ? "Sisa File Sistem & Firmlinks macOS" : "Remaining macOS System Files & Firmlinks"
+        case "sysdata.residualDesc": return isId ? "Struktur direktori firmlink APFS, font sistem, dan alokasi filesystem macOS" : "APFS firmlink filesystem structures, system fonts, and OS allocations"
+        case "sysdata.footerHint": return isId ? "Tips: Gunakan 'Pembersih Sampah' & 'Cache & Logs' untuk mengosongkan ruang yang aman dihapus." : "Tip: Use 'Junk Cleaner' & 'Cache & Logs' to safely free up cleanable space."
+        case "sysdata.inspectBtn": return isId ? "Rincian" : "Inspect"
+
         // ── Cleanable Types ──
         case "clean.appCache": return isId ? "Cache Aplikasi" : "Application Caches"
         case "clean.systemLogs": return isId ? "File Log & Diagnostik" : "System & Diagnostic Logs"

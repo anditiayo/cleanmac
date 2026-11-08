@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct DashboardOverviewView: View {
     @ObservedObject var viewModel: DashboardViewModel
+    @State private var showSystemDataSheet: Bool = false
 
     public init(viewModel: DashboardViewModel) {
         self.viewModel = viewModel
@@ -145,7 +146,7 @@ public struct DashboardOverviewView: View {
                         icon: "internaldrive.fill",
                         color: .gray
                     ) {
-                        viewModel.selectedTab = .allFolders
+                        showSystemDataSheet = true
                     }
                 }
 
@@ -158,8 +159,10 @@ public struct DashboardOverviewView: View {
                         viewModel.selectedTab = .caches
                     case .documents, .downloads, .media:
                         viewModel.selectedTab = .files
-                    case .developer, .other:
+                    case .developer:
                         viewModel.selectedTab = .allFolders
+                    case .other:
+                        showSystemDataSheet = true
                     }
                 }
 
@@ -267,6 +270,9 @@ public struct DashboardOverviewView: View {
         }
         .sheet(isPresented: $viewModel.showScanPermissionSheet) {
             ScanPermissionSheet(viewModel: viewModel)
+        }
+        .sheet(isPresented: $showSystemDataSheet) {
+            SystemDataDetailSheet(viewModel: viewModel)
         }
     }
 }
