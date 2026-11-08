@@ -149,3 +149,4 @@ private struct DetailRow: View {
         }
     }
 }
+

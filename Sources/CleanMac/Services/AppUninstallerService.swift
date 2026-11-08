@@ -150,3 +150,4 @@ public final class AppUninstallerService: Sendable {
         return (true, "Berhasil menghapus \(package.app.name) beserta \(package.leftovers.count) data terkait (\(ByteFormatter.string(from: totalBytesFreed)) dibebaskan)!")
     }
 }
+

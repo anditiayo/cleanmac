@@ -25,59 +25,119 @@ public struct AppListView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // Header bar
-            HStack(spacing: 12) {
-                Button {
-                    viewModel.selectedTab = .dashboard
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                        Text("Dashboard")
+            // PRO HEADER SECTION
+            VStack(spacing: 12) {
+                // Row 1: Back Navigation + Search + Sort
+                HStack(alignment: .center, spacing: 10) {
+                    Button {
+                        viewModel.selectedTab = .dashboard
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text("Dashboard")
+                                .font(.subheadline)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color(nsColor: .controlBackgroundColor))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                        )
                     }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+
+                    // Native Search Field
+                    HStack(spacing: 6) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                        TextField("Cari aplikasi...", text: $searchText)
+                            .textFieldStyle(.plain)
+                            .font(.subheadline)
+                        if !searchText.isEmpty {
+                            Button {
+                                searchText = ""
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .frame(width: 190)
+                    .background(Color(nsColor: .controlBackgroundColor))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                    )
+
+                    // Sort button
+                    Button {
+                        sortAscending.toggle()
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: sortAscending ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                                .foregroundColor(.blue)
+                            Text(sortAscending ? "Terkecil" : "Terbesar")
+                                .font(.subheadline)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color(nsColor: .controlBackgroundColor))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.regular)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Aplikasi Terinstal")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    Text("Ditemukan \(viewModel.applications.count) aplikasi • Total: \(ByteFormatter.string(from: viewModel.totalAppsSize))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                // Row 2: Title & Metrics
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Aplikasi Terinstal")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .lineLimit(1)
+                        Text("Kelola aplikasi terpasang & copot sisa berkas secara tuntas (Uninstaller)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
 
-                Spacer()
+                    Spacer()
 
-                // Search field
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-                    TextField("Cari aplikasi...", text: $searchText)
-                        .textFieldStyle(.plain)
-                        .frame(width: 180)
-                    if !searchText.isEmpty {
-                        Button {
-                            searchText = ""
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
+                    // Metrics badge
+                    HStack(spacing: 12) {
+                        VStack(alignment: .trailing, spacing: 1) {
+                            Text(ByteFormatter.string(from: viewModel.totalAppsSize))
+                                .font(.system(.title3, design: .monospaced))
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+                            Text("\(filteredApps.count) aplikasi terdeteksi")
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
-                        .buttonStyle(.plain)
                     }
-                }
-                .padding(6)
-                .background(Color(nsColor: .controlBackgroundColor))
-                .cornerRadius(8)
-
-                // Sort toggle
-                Button {
-                    sortAscending.toggle()
-                } label: {
-                    Label(sortAscending ? "Terkecil" : "Terbesar", systemImage: sortAscending ? "arrow.up.circle" : "arrow.down.circle")
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color(nsColor: .controlBackgroundColor).opacity(0.8))
+                    .cornerRadius(10)
                 }
             }
-            .padding()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .background(Color(nsColor: .windowBackgroundColor))
 
             Divider()
 

@@ -46,6 +46,13 @@ public final class DashboardViewModel: ObservableObject {
     @Published public var currentStatus: String = "Ready"
     @Published public var selectedTab: NavigationTab = .dashboard
     @Published public var searchText: String = ""
+    @Published public var showScanPermissionSheet: Bool = false
+    @Published public var scanPermissions = ScanPermissions()
+
+    public var hasAllowedScanPermission: Bool {
+        get { UserDefaults.standard.bool(forKey: "hasAllowedScanPermission") }
+        set { UserDefaults.standard.set(newValue, forKey: "hasAllowedScanPermission") }
+    }
 
     private let diskAnalyzer = DiskAnalyzer()
     private let appScanner = AppScanner()
@@ -62,64 +69,93 @@ public final class DashboardViewModel: ObservableObject {
         diskInfo = diskAnalyzer.analyzeMainDisk()
     }
 
-    public func startFullScan() {
+    public func requestScan() {
+        if !hasAllowedScanPermission {
+            showScanPermissionSheet = true
+        } else {
+            startScanWithOptions()
+        }
+    }
+
+    public func saveAndApplyPermissions(_ permissions: ScanPermissions, remember: Bool) {
+        self.scanPermissions = permissions
+        if remember {
+            self.hasAllowedScanPermission = true
+        }
+    }
+
+    public func startScanWithOptions() {
         guard !isScanning else { return }
         isScanning = true
-        currentStatus = "Reading disk usage..."
+        currentStatus = "Membaca kapasitas disk..."
 
         Task { [weak self] in
             guard let self = self else { return }
             self.refreshDiskInfo()
 
-            // 1. Deep directory scan first (most comprehensive)
-            self.currentStatus = "Deep scan: menganalisis semua folder..."
-            let dirs = await self.deepScanner.scanAllDirectories { [weak self] status in
-                Task { @MainActor [weak self] in
-                    self?.currentStatus = status
+            var dirs: [DeepStorageScanner.DirectorySize] = self.directorySizes
+            if self.scanPermissions.scanDeepDirectories {
+                self.currentStatus = "Deep scan: menganalisis semua folder..."
+                dirs = await self.deepScanner.scanAllDirectories { [weak self] status in
+                    Task { @MainActor [weak self] in
+                        self?.currentStatus = status
+                    }
                 }
+                self.directorySizes = dirs
             }
-            self.directorySizes = dirs
 
-            // 2. App scan
-            self.currentStatus = "Scanning installed applications..."
-            let apps = await self.appScanner.scanApplications { [weak self] current, name in
-                Task { @MainActor [weak self] in
-                    self?.currentStatus = "Scanning app: \(name)"
+            var apps: [AppInfo] = self.applications
+            if self.scanPermissions.scanApplications {
+                self.currentStatus = "Scanning installed applications..."
+                apps = await self.appScanner.scanApplications { [weak self] _, name in
+                    Task { @MainActor [weak self] in
+                        self?.currentStatus = "Scanning app: \(name)"
+                    }
                 }
+                self.applications = apps
             }
-            self.applications = apps
 
-            // 3. Large files (lower threshold to 10 MB)
-            self.currentStatus = "Scanning large user files..."
-            let files = await self.fileScanner.scanLargeFiles(minSizeBytes: 10 * 1024 * 1024, maxResults: 200) { [weak self] folder in
-                Task { @MainActor [weak self] in
-                    self?.currentStatus = "Scanning folder: \(folder)"
+            var files: [FileInfo] = self.largeFiles
+            if self.scanPermissions.scanLargeFiles {
+                self.currentStatus = "Scanning large user files..."
+                files = await self.fileScanner.scanLargeFiles(minSizeBytes: 10 * 1024 * 1024, maxResults: 200) { [weak self] folder in
+                    Task { @MainActor [weak self] in
+                        self?.currentStatus = "Scanning folder: \(folder)"
+                    }
                 }
+                self.largeFiles = files
             }
-            self.largeFiles = files
 
-            // 4. Caches
-            self.currentStatus = "Scanning cache directories..."
-            let caches = await self.cacheScanner.scanCaches { [weak self] folder in
-                Task { @MainActor [weak self] in
-                    self?.currentStatus = "Checking caches: \(folder)"
+            var caches: [FileInfo] = self.cacheFiles
+            if self.scanPermissions.scanCaches {
+                self.currentStatus = "Scanning cache directories..."
+                caches = await self.cacheScanner.scanCaches { [weak self] folder in
+                    Task { @MainActor [weak self] in
+                        self?.currentStatus = "Checking caches: \(folder)"
+                    }
                 }
+                self.cacheFiles = caches
             }
-            self.cacheFiles = caches
 
-            // 5. Cleanable junk
-            self.currentStatus = "Scanning cleanable junk files..."
-            let cleanables = await self.junkScanner.scanCleanableItems { [weak self] status in
-                Task { @MainActor [weak self] in
-                    self?.currentStatus = status
+            var cleanables: [CleanableItem] = self.cleanableItems
+            if self.scanPermissions.scanJunk {
+                self.currentStatus = "Scanning cleanable junk files..."
+                cleanables = await self.junkScanner.scanCleanableItems { [weak self] status in
+                    Task { @MainActor [weak self] in
+                        self?.currentStatus = status
+                    }
                 }
+                self.cleanableItems = cleanables
+                self.selectedCleanableIDs = Set(cleanables.map { $0.id })
             }
-            self.cleanableItems = cleanables
-            self.selectedCleanableIDs = Set(cleanables.map { $0.id })
 
             self.isScanning = false
             self.currentStatus = "Scan selesai! Ditemukan \(dirs.count) folder, \(apps.count) app, \(files.count) file besar, \(cleanables.count) item sampah."
         }
+    }
+
+    public func startFullScan() {
+        startScanWithOptions()
     }
 
     public var totalAppsSize: Int64 {
@@ -219,10 +255,18 @@ public final class DashboardViewModel: ObservableObject {
             }
         }
 
-        return StorageCategory.allCases.compactMap { cat in
+        // Active colored categories first (sorted largest to smallest), with System Data (.other) placed at the end!
+        let activeCategories = StorageCategory.allCases.filter { $0 != .other }.compactMap { cat -> CategoryUsage? in
             guard let size = map[cat], size > 0 else { return nil }
             return CategoryUsage(id: cat.rawValue, category: cat, size: size)
         }.sorted { $0.size > $1.size }
+
+        var result = activeCategories
+        if let systemSize = map[.other], systemSize > 0 {
+            result.append(CategoryUsage(id: StorageCategory.other.rawValue, category: .other, size: systemSize))
+        }
+
+        return result
     }
 
     public func revealInFinder(url: URL) {

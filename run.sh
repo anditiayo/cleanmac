@@ -12,6 +12,9 @@ cp .build/release/CleanMac CleanMac.app/Contents/MacOS/
 if [ -f Resources/AppIcon.icns ]; then
     cp Resources/AppIcon.icns CleanMac.app/Contents/Resources/
 fi
+if [ -f Resources/Credits.rtf ]; then
+    cp Resources/Credits.rtf CleanMac.app/Contents/Resources/
+fi
 
 cat << 'EOF' > CleanMac.app/Contents/Info.plist
 <?xml version="1.0" encoding="UTF-8"?>
@@ -40,6 +43,12 @@ cat << 'EOF' > CleanMac.app/Contents/Info.plist
     <string>13.0</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>CleanMac memerlukan izin untuk menganalisis file besar di folder Desktop.</string>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>CleanMac memerlukan izin untuk menganalisis file besar di folder Dokumen.</string>
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>CleanMac memerlukan izin untuk menganalisis file dan installer di folder Unduhan.</string>
 </dict>
 </plist>
 EOF

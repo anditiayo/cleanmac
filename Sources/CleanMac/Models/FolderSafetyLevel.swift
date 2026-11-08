@@ -42,3 +42,4 @@ public enum FolderSafetyLevel: String, Sendable {
         return .caution
     }
 }
+

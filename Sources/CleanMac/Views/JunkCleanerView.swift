@@ -11,76 +11,128 @@ public struct JunkCleanerView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            // Top Summary Bar
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .center, spacing: 12) {
+            // PRO HEADER SECTION
+            VStack(spacing: 12) {
+                // Row 1: Back Navigation + Selection Actions
+                HStack(alignment: .center, spacing: 10) {
                     Button {
                         viewModel.selectedTab = .dashboard
                     } label: {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 5) {
                             Image(systemName: "chevron.left")
+                                .font(.system(size: 11, weight: .semibold))
                             Text("Dashboard")
+                                .font(.subheadline)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color(nsColor: .controlBackgroundColor))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+
+                    if !viewModel.cleanableItems.isEmpty {
+                        HStack(spacing: 8) {
+                            Button {
+                                viewModel.selectAllCleanables()
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "checkmark.circle")
+                                    Text("Pilih Semua")
+                                }
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .background(Color(nsColor: .controlBackgroundColor))
+                                .cornerRadius(6)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                viewModel.deselectAllCleanables()
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "xmark.circle")
+                                    Text("Batal Pilih")
+                                }
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .background(Color(nsColor: .controlBackgroundColor))
+                                .cornerRadius(6)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                                )
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.regular)
+                }
 
-                    VStack(alignment: .leading, spacing: 4) {
+                // Row 2: Title & Metrics / Action
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text("Pembersih File Aman Dihapus")
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("File cache, log sistem, build cache, dan installer bekas yang aman dibersihkan.")
+                            .lineLimit(1)
+                        Text("Cache build, temporary log, package manager cache, dan installer sisa")
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
                     }
 
                     Spacer()
 
                     if !viewModel.cleanableItems.isEmpty {
-                        Button(role: .destructive) {
-                            showDeleteSelectedAlert = true
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "trash.fill")
-                                Text("Hapus Yang Dipilih (\(ByteFormatter.string(from: viewModel.selectedCleanableSize)))")
-                                    .fontWeight(.semibold)
+                        HStack(spacing: 12) {
+                            // Summary badge
+                            VStack(alignment: .trailing, spacing: 1) {
+                                Text(ByteFormatter.string(from: viewModel.selectedCleanableSize))
+                                    .font(.system(.title3, design: .monospaced))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                                Text("\(viewModel.selectedCleanableIDs.count) dari \(viewModel.cleanableItems.count) item dipilih")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
                             }
                             .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
+                            .padding(.vertical, 5)
+                            .background(Color(nsColor: .controlBackgroundColor).opacity(0.8))
+                            .cornerRadius(8)
+
+                            // Action button
+                            Button(role: .destructive) {
+                                showDeleteSelectedAlert = true
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "trash.fill")
+                                    Text("Hapus Yang Dipilih")
+                                        .fontWeight(.semibold)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 7)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+                            .disabled(viewModel.selectedCleanableIDs.isEmpty)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.red)
-                        .disabled(viewModel.selectedCleanableIDs.isEmpty)
-                    }
-                }
-
-                HStack {
-                    Text("Ditemukan: \(viewModel.cleanableItems.count) item • Potensi penghematan: \(ByteFormatter.string(from: viewModel.totalCleanableSize))")
-                        .font(.caption)
-                        .foregroundColor(.primary)
-
-                    Spacer()
-
-                    if !viewModel.cleanableItems.isEmpty {
-                        Button("Pilih Semua") {
-                            viewModel.selectAllCleanables()
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-                        .foregroundColor(.blue)
-
-                        Text("•").foregroundColor(.secondary)
-
-                        Button("Batal Pilih") {
-                            viewModel.deselectAllCleanables()
-                        }
-                        .buttonStyle(.plain)
-                        .font(.caption)
-                        .foregroundColor(.blue)
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
             .background(Color(nsColor: .windowBackgroundColor))
 
             Divider()

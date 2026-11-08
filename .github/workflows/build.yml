@@ -14,8 +14,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Build CleanMac
+    - name: Build CleanMac & Package DMG
       run: |
         swift --version
-        swift build -c release
+        chmod +x create_dmg.sh
+        ./create_dmg.sh
 
+    - name: Upload CleanMac DMG Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CleanMac-Installer-macOS
+        path: CleanMac-Installer.dmg

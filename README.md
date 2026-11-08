@@ -17,7 +17,17 @@
   <img src="https://img.shields.io/badge/Platform-macOS%2013%2B-blue?logo=apple" alt="macOS" />
   <img src="https://img.shields.io/badge/Swift-5.9%20%7C%206.0-orange?logo=swift" alt="Swift" />
   <img src="https://img.shields.io/badge/UI-SwiftUI%20%2B%20Swift%20Charts-indigo" alt="SwiftUI" />
+  <img src="https://img.shields.io/badge/Author-Yogi%20Anditia-brightgreen" alt="Author" />
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/anditiayo/cleanmac/releases/latest/download/CleanMac-Installer.dmg">
+    <img src="https://img.shields.io/badge/Download-CleanMac--Installer.dmg-007AFF?style=for-the-badge&logo=apple&logoColor=white" alt="Download DMG" />
+  </a>
+  <a href="https://paypal.me/Anditia">
+    <img src="https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate with PayPal" />
+  </a>
 </p>
 
 ---
@@ -124,6 +134,30 @@ cd cleanmac
 
 ---
 
+## ☕ Dukungan & Donasi / Support & Donate
+
+CleanMac adalah perangkat lunak gratis dan open-source yang dikembangkan oleh **Yogi Anditia**.
+
+Jika CleanMac bermanfaat dalam membantu Anda mengelola penyimpanan Mac, Anda dapat memberikan dukungan dan apresiasi donasi melalui PayPal:
+
+<p align="center">
+  <a href="https://paypal.me/Anditia">
+    <img src="https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="Donate with PayPal" />
+  </a>
+  <br>
+  <b>Tautan PayPal:</b> <a href="https://paypal.me/Anditia">https://paypal.me/Anditia</a>
+</p>
+
+---
+
+## 👨‍💻 Author & Credits
+
+**Yogi Anditia**
+- GitHub: [@anditiayo](https://github.com/anditiayo)
+- PayPal: [paypal.me/Anditia](https://paypal.me/Anditia)
+
+---
+
 ## 📄 License
 
-Proyek ini dilisensikan di bawah [MIT License](LICENSE) © 2026 yogianditia.
+Proyek ini dilisensikan di bawah [MIT License](LICENSE) © 2026 Yogi Anditia.

@@ -3,6 +3,7 @@ import SwiftUI
 public struct MainContentView: View {
     @StateObject private var viewModel = DashboardViewModel()
     @AppStorage("appTheme") private var selectedThemeRaw: String = AppTheme.system.rawValue
+    @State private var showAboutSheet: Bool = false
 
     private var selectedTheme: AppTheme {
         AppTheme(rawValue: selectedThemeRaw) ?? .system
@@ -22,19 +23,33 @@ public struct MainContentView: View {
 
                 Divider()
 
-                // Theme Switcher Footer in Sidebar
-                HStack(spacing: 8) {
-                    Text("Tema:")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                // Theme Switcher & About Footer in Sidebar
+                VStack(spacing: 8) {
+                    HStack(spacing: 8) {
+                        Text("Tema:")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
 
-                    Picker("Tema", selection: $selectedThemeRaw) {
-                        ForEach(AppTheme.allCases) { theme in
-                            Image(systemName: theme.iconName).tag(theme.rawValue)
+                        Picker("Tema", selection: $selectedThemeRaw) {
+                            ForEach(AppTheme.allCases) { theme in
+                                Image(systemName: theme.iconName).tag(theme.rawValue)
+                            }
                         }
+                        .pickerStyle(.segmented)
+                        .controlSize(.small)
                     }
-                    .pickerStyle(.segmented)
-                    .controlSize(.small)
+
+                    Button {
+                        showAboutSheet = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "info.circle")
+                            Text("Tentang & Donasi (Yogi Anditia)")
+                        }
+                        .font(.caption2)
+                        .foregroundColor(.blue)
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(10)
                 .background(Color(nsColor: .controlBackgroundColor).opacity(0.5))
@@ -60,6 +75,9 @@ public struct MainContentView: View {
             .frame(minWidth: 620, minHeight: 460)
         }
         .preferredColorScheme(selectedTheme.colorScheme)
+        .sheet(isPresented: $showAboutSheet) {
+            AboutView()
+        }
         .onAppear {
             viewModel.refreshDiskInfo()
         }

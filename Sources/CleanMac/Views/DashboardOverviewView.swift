@@ -32,30 +32,42 @@ public struct DashboardOverviewView: View {
 
                     Spacer()
 
-                    Button {
-                        viewModel.startFullScan()
-                    } label: {
-                        HStack(spacing: 6) {
-                            if viewModel.isScanning {
-                                ProgressView()
-                                    .controlSize(.small)
-                            } else {
-                                Image(systemName: "arrow.clockwise")
+                    HStack(spacing: 8) {
+                        Button {
+                            viewModel.requestScan()
+                        } label: {
+                            HStack(spacing: 6) {
+                                if viewModel.isScanning {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else {
+                                    Image(systemName: "arrow.clockwise")
+                                }
+                                Text(viewModel.isScanning ? "Scanning..." : "Mulai Scan")
                             }
-                            Text(viewModel.isScanning ? "Scanning..." : "Mulai Scan")
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
                         }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
+                        .buttonStyle(.borderedProminent)
+                        .disabled(viewModel.isScanning)
+
+                        Button {
+                            viewModel.showScanPermissionSheet = true
+                        } label: {
+                            Image(systemName: "checklist")
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.regular)
+                        .help("Atur Izin & Opsi Pemindaian...")
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(viewModel.isScanning)
                 }
 
                 // 1. Storage Bar (Divided by category colors like macOS Settings)
                 StorageBarView(diskInfo: viewModel.diskInfo, categories: viewModel.categoryUsages)
 
-                // 2. Quick Stat Cards - Row 1
-                HStack(spacing: 12) {
+                // 2. Quick Stat Cards - Symmetrical 3x2 Grid
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                     StatCard(
                         title: "Semua Folder",
                         value: ByteFormatter.string(from: viewModel.totalDirectorySizesScanned),
@@ -85,10 +97,7 @@ public struct DashboardOverviewView: View {
                     ) {
                         viewModel.selectedTab = .apps
                     }
-                }
 
-                // Quick Stat Cards - Row 2
-                HStack(spacing: 12) {
                     StatCard(
                         title: "File Besar",
                         value: ByteFormatter.string(from: viewModel.totalLargeFilesSize),
@@ -108,10 +117,31 @@ public struct DashboardOverviewView: View {
                     ) {
                         viewModel.selectedTab = .caches
                     }
+
+                    StatCard(
+                        title: "System Data",
+                        value: ByteFormatter.string(from: viewModel.systemDataSize),
+                        subtitle: "macOS & sistem",
+                        icon: "internaldrive.fill",
+                        color: .gray
+                    ) {
+                        viewModel.selectedTab = .allFolders
+                    }
                 }
 
-                // 3. Storage Chart
-                StorageChartView(categories: viewModel.categoryUsages)
+                // 3. Storage Category Breakdown
+                StorageChartView(categories: viewModel.categoryUsages) { category in
+                    switch category {
+                    case .apps:
+                        viewModel.selectedTab = .apps
+                    case .cache:
+                        viewModel.selectedTab = .caches
+                    case .documents, .downloads, .media:
+                        viewModel.selectedTab = .files
+                    case .developer, .other:
+                        viewModel.selectedTab = .allFolders
+                    }
+                }
 
                 // 4. Top 5 Largest Apps
                 if !viewModel.applications.isEmpty {
@@ -206,6 +236,9 @@ public struct DashboardOverviewView: View {
                 }
             }
             .padding(20)
+        }
+        .sheet(isPresented: $viewModel.showScanPermissionSheet) {
+            ScanPermissionSheet(viewModel: viewModel)
         }
     }
 }

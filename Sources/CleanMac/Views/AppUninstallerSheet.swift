@@ -266,3 +266,4 @@ public struct AppUninstallerSheet: View {
         }
     }
 }
+
