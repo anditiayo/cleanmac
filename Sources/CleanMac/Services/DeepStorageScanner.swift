@@ -38,6 +38,10 @@ public final class DeepStorageScanner: Sendable {
         public var formattedSize: String {
             ByteFormatter.string(from: size)
         }
+
+        public var safetyLevel: FolderSafetyLevel {
+            FolderSafetyLevel.evaluate(path: url.path, category: category)
+        }
     }
 
     /// Total used space on the main volume as an absolute physical upper ceiling
