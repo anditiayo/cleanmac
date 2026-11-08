@@ -60,9 +60,18 @@ public final class DashboardViewModel: ObservableObject {
     @Published public var showScanPermissionSheet: Bool = false
     @Published public var scanPermissions = ScanPermissions()
 
+    private let defaults = UserDefaults(suiteName: "com.cleanmac.app") ?? UserDefaults.standard
+
     public var hasAllowedScanPermission: Bool {
-        get { UserDefaults.standard.bool(forKey: "hasAllowedScanPermission") }
-        set { UserDefaults.standard.set(newValue, forKey: "hasAllowedScanPermission") }
+        get {
+            defaults.bool(forKey: "hasAllowedScanPermission") || UserDefaults.standard.bool(forKey: "hasAllowedScanPermission")
+        }
+        set {
+            defaults.set(newValue, forKey: "hasAllowedScanPermission")
+            UserDefaults.standard.set(newValue, forKey: "hasAllowedScanPermission")
+            defaults.synchronize()
+            UserDefaults.standard.synchronize()
+        }
     }
 
     private let diskAnalyzer = DiskAnalyzer()
@@ -74,6 +83,14 @@ public final class DashboardViewModel: ObservableObject {
 
     public init() {
         refreshDiskInfo()
+        loadSavedPermissions()
+    }
+
+    private func loadSavedPermissions() {
+        if let data = defaults.data(forKey: "savedScanPermissions") ?? UserDefaults.standard.data(forKey: "savedScanPermissions"),
+           let saved = try? JSONDecoder().decode(ScanPermissions.self, from: data) {
+            self.scanPermissions = saved
+        }
     }
 
     public func refreshDiskInfo() {
@@ -90,6 +107,10 @@ public final class DashboardViewModel: ObservableObject {
 
     public func saveAndApplyPermissions(_ permissions: ScanPermissions, remember: Bool) {
         self.scanPermissions = permissions
+        if let data = try? JSONEncoder().encode(permissions) {
+            defaults.set(data, forKey: "savedScanPermissions")
+            UserDefaults.standard.set(data, forKey: "savedScanPermissions")
+        }
         if remember {
             self.hasAllowedScanPermission = true
         }
@@ -98,7 +119,7 @@ public final class DashboardViewModel: ObservableObject {
     public func startScanWithOptions() {
         guard !isScanning else { return }
         isScanning = true
-        currentStatus = "Membaca kapasitas disk..."
+        currentStatus = loc("status.readingDisk")
 
         Task { [weak self] in
             guard let self = self else { return }
@@ -106,7 +127,7 @@ public final class DashboardViewModel: ObservableObject {
 
             var dirs: [DeepStorageScanner.DirectorySize] = self.directorySizes
             if self.scanPermissions.scanDeepDirectories {
-                self.currentStatus = "Deep scan: menganalisis semua folder..."
+                self.currentStatus = loc("status.deepScan")
                 dirs = await self.deepScanner.scanAllDirectories { [weak self] status in
                     Task { @MainActor [weak self] in
                         self?.currentStatus = status
@@ -117,10 +138,10 @@ public final class DashboardViewModel: ObservableObject {
 
             var apps: [AppInfo] = self.applications
             if self.scanPermissions.scanApplications {
-                self.currentStatus = "Scanning installed applications..."
+                self.currentStatus = loc("status.scanningApps")
                 apps = await self.appScanner.scanApplications { [weak self] _, name in
                     Task { @MainActor [weak self] in
-                        self?.currentStatus = "Scanning app: \(name)"
+                        self?.currentStatus = "\(loc("status.scanningApp")) \(name)"
                     }
                 }
                 self.applications = apps
@@ -128,10 +149,10 @@ public final class DashboardViewModel: ObservableObject {
 
             var files: [FileInfo] = self.largeFiles
             if self.scanPermissions.scanLargeFiles {
-                self.currentStatus = "Scanning large user files..."
+                self.currentStatus = loc("status.scanningLargeFiles")
                 files = await self.fileScanner.scanLargeFiles(minSizeBytes: 10 * 1024 * 1024, maxResults: 200) { [weak self] folder in
                     Task { @MainActor [weak self] in
-                        self?.currentStatus = "Scanning folder: \(folder)"
+                        self?.currentStatus = "\(loc("status.scanningFolder")) \(folder)"
                     }
                 }
                 self.largeFiles = files
@@ -139,10 +160,10 @@ public final class DashboardViewModel: ObservableObject {
 
             var caches: [FileInfo] = self.cacheFiles
             if self.scanPermissions.scanCaches {
-                self.currentStatus = "Scanning cache directories..."
+                self.currentStatus = loc("status.scanningCaches")
                 caches = await self.cacheScanner.scanCaches { [weak self] folder in
                     Task { @MainActor [weak self] in
-                        self?.currentStatus = "Checking caches: \(folder)"
+                        self?.currentStatus = "\(loc("status.checkingCaches")) \(folder)"
                     }
                 }
                 self.cacheFiles = caches
@@ -150,7 +171,7 @@ public final class DashboardViewModel: ObservableObject {
 
             var cleanables: [CleanableItem] = self.cleanableItems
             if self.scanPermissions.scanJunk {
-                self.currentStatus = "Scanning cleanable junk files..."
+                self.currentStatus = loc("status.scanningJunk")
                 cleanables = await self.junkScanner.scanCleanableItems { [weak self] status in
                     Task { @MainActor [weak self] in
                         self?.currentStatus = status
@@ -161,7 +182,7 @@ public final class DashboardViewModel: ObservableObject {
             }
 
             self.isScanning = false
-            self.currentStatus = "Scan selesai! Ditemukan \(dirs.count) folder, \(apps.count) app, \(files.count) file besar, \(cleanables.count) item sampah."
+            self.currentStatus = "\(loc("status.scanDone")) \(loc("status.found")) \(dirs.count) \(loc("status.folders")), \(apps.count) \(loc("status.apps")), \(files.count) \(loc("status.largeFiles")), \(cleanables.count) \(loc("status.junkItems"))."
         }
     }
 
@@ -237,10 +258,9 @@ public final class DashboardViewModel: ObservableObject {
             count += 1
         }
         refreshDiskInfo()
-        currentStatus = "Berhasil menghapus \(count) item sampah!"
+        currentStatus = "\(loc("status.deletedJunk")) \(count) \(loc("status.junkItemsSuffix"))"
     }
 
-    // Accurate category usage calculation matching macOS Settings
     public var categoryUsages: [CategoryUsage] {
         var map: [StorageCategory: Int64] = [:]
 
@@ -250,14 +270,14 @@ public final class DashboardViewModel: ObservableObject {
         // 2. Cache
         map[.cache] = totalCachesSize
 
-        // 3. Collect specific categories (developer, documents, media, downloads)
+        // 3. Collect specific categories
         for dir in directorySizes {
             if dir.category != .apps && dir.category != .other {
                 map[dir.category, default: 0] += dir.size
             }
         }
 
-        // 4. In macOS, System Data & Other represents the remaining used physical disk space
+        // 4. System Data & Other represents remaining used space
         if diskInfo.usedSpace > 0 {
             let knownUsed = map.values.reduce(0, +)
             let systemData = max(0, diskInfo.usedSpace - knownUsed)
@@ -266,7 +286,6 @@ public final class DashboardViewModel: ObservableObject {
             }
         }
 
-        // Active colored categories first (sorted largest to smallest), with System Data (.other) placed at the end!
         let activeCategories = StorageCategory.allCases.filter { $0 != .other }.compactMap { cat -> CategoryUsage? in
             guard let size = map[cat], size > 0 else { return nil }
             return CategoryUsage(id: cat.rawValue, category: cat, size: size)
@@ -295,7 +314,7 @@ public final class DashboardViewModel: ObservableObject {
             refreshDiskInfo()
             return true
         } catch {
-            currentStatus = "Gagal memindahkan ke Trash: \(error.localizedDescription)"
+            currentStatus = "\(loc("status.trashFailed")) \(error.localizedDescription)"
             return false
         }
     }
@@ -313,6 +332,6 @@ public final class DashboardViewModel: ObservableObject {
         }
         cacheFiles.removeAll()
         refreshDiskInfo()
-        currentStatus = "Berhasil membersihkan \(count) folder cache!"
+        currentStatus = "\(loc("status.cleanedCache")) \(count) \(loc("status.cacheFolders"))"
     }
 }

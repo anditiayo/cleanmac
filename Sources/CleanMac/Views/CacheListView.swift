@@ -30,19 +30,10 @@ public struct CacheListView: View {
                         HStack(spacing: 5) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 11, weight: .semibold))
-                            Text("Dashboard")
-                                .font(.subheadline)
+                            Text(loc("action.back"))
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
 
                     Spacer()
 
@@ -51,7 +42,7 @@ public struct CacheListView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
-                        TextField("Cari cache...", text: $searchText)
+                        TextField(loc("search.cache"), text: $searchText)
                             .textFieldStyle(.plain)
                             .font(.subheadline)
                         if !searchText.isEmpty {
@@ -82,40 +73,21 @@ public struct CacheListView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "trash.fill")
                                     .font(.system(size: 11, weight: .semibold))
-                                Text("Bersihkan Semua Cache")
-                                    .font(.system(size: 12, weight: .semibold))
+                                Text(loc("action.cleanAllCaches"))
                             }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [Color(red: 0.92, green: 0.28, blue: 0.28), Color(red: 0.80, green: 0.18, blue: 0.18)],
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
-                                    )
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
-                            )
-                            .shadow(color: Color.red.opacity(0.3), radius: 4, x: 0, y: 2)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(ModernPrimaryButtonStyle(isDestructive: true))
                     }
                 }
 
                 // Row 2: Title & Metrics
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Cache & Temporary Files")
+                        Text(loc("header.caches"))
                             .font(.title2)
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        Text("Berkas cache aplikasi dan log diagnostik di folder ~/Library/Caches")
+                        Text(loc("header.cachesSub"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
@@ -130,7 +102,7 @@ public struct CacheListView: View {
                                 .font(.system(.title3, design: .monospaced))
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
-                            Text("\(filteredCaches.count) folder cache")
+                            Text("\(filteredCaches.count) \(loc("stat.cacheFolders"))")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -147,7 +119,7 @@ public struct CacheListView: View {
 
                 // Row 3: Guide Legend Bar
                 HStack(spacing: 14) {
-                    Text("Panduan Cache:")
+                    Text(loc("guide.cacheGuide"))
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -156,7 +128,7 @@ public struct CacheListView: View {
                         Image(systemName: "checkmark.shield.fill")
                             .font(.system(size: 11))
                             .foregroundColor(.green)
-                        Text("Aman Dihapus (Akan dibuat ulang otomatis oleh aplikasi saat diperlukan)")
+                        Text(loc("guide.cacheSafety"))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -174,88 +146,88 @@ public struct CacheListView: View {
                     Image(systemName: "trash.fill")
                         .font(.system(size: 48))
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text(viewModel.isScanning ? "Sedang memindai folder cache..." : "Tidak ada folder cache signifikan (>10 MB).")
+                    Text(viewModel.isScanning ? loc("empty.scanningCaches") : loc("empty.noCachesFound"))
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(filteredCaches) { item in
-                    HStack(spacing: 14) {
-                        Image(systemName: "archivebox.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(.orange)
-                            .frame(width: 36, height: 36)
+                List(Array(filteredCaches.enumerated()), id: \.element.id) { index, item in
+                    ModernListRowContainer(index: index) {
+                        HStack(spacing: 14) {
+                            Image(systemName: "archivebox.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.orange)
+                                .frame(width: 36, height: 36)
 
-                        VStack(alignment: .leading, spacing: 3) {
-                            HStack(spacing: 6) {
-                                Text(item.name)
-                                    .font(.body)
-                                    .fontWeight(.medium)
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 6) {
+                                    Text(item.name)
+                                        .font(.body)
+                                        .fontWeight(.medium)
 
-                                Text("Cache")
+                                    Text(loc("tag.cache"))
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.orange.opacity(0.15))
+                                        .foregroundColor(.orange)
+                                        .cornerRadius(4)
+
+                                    Text(loc("tag.safeToDelete"))
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.green.opacity(0.15))
+                                        .foregroundColor(.green)
+                                        .cornerRadius(4)
+                                }
+
+                                Text(item.url.path)
                                     .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.orange.opacity(0.15))
-                                    .foregroundColor(.orange)
-                                    .cornerRadius(4)
-
-                                Text("Aman Dihapus")
-                                    .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.green.opacity(0.15))
-                                    .foregroundColor(.green)
-                                    .cornerRadius(4)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
                             }
 
-                            Text(item.url.path)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
+                            Spacer()
+
+                            let maxSize = filteredCaches.first?.size ?? 1
+                            let fraction = CGFloat(item.size) / CGFloat(maxSize)
+                            GeometryReader { geo in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color.orange.opacity(0.35))
+                                    .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                    .frame(maxHeight: .infinity, alignment: .center)
+                            }
+                            .frame(width: 80, height: 20)
+
+                            Text(item.formattedSize)
+                                .font(.system(.body, design: .monospaced))
+                                .fontWeight(.semibold)
+                                .frame(width: 85, alignment: .trailing)
+
+                            Button {
+                                viewModel.revealInFinder(url: item.url)
+                            } label: {
+                                Image(systemName: "folder.badge.gearshape")
+                            }
+                            .buttonStyle(ModernRowActionStyle(tint: .secondary))
+                            .help(loc("help.showInFinder"))
+
+                            Button(role: .destructive) {
+                                _ = viewModel.moveToTrash(url: item.url)
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                            .buttonStyle(ModernRowActionStyle(isDanger: true))
+                            .help(loc("help.moveToTrash"))
                         }
-
-                        Spacer()
-
-                        // Relative visual size bar (matching DirectorySizesView)
-                        let maxSize = filteredCaches.first?.size ?? 1
-                        let fraction = CGFloat(item.size) / CGFloat(maxSize)
-                        GeometryReader { geo in
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.orange.opacity(0.35))
-                                .frame(width: max(4, geo.size.width * fraction), height: 8)
-                                .frame(maxHeight: .infinity, alignment: .center)
-                        }
-                        .frame(width: 80, height: 20)
-
-                        Text(item.formattedSize)
-                            .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .frame(width: 85, alignment: .trailing)
-
-                        Button {
-                            viewModel.revealInFinder(url: item.url)
-                        } label: {
-                            Image(systemName: "folder.badge.gearshape")
-                        }
-                        .help("Tampilkan di Finder")
-                        .buttonStyle(.borderless)
-
-                        Button(role: .destructive) {
-                            _ = viewModel.moveToTrash(url: item.url)
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red.opacity(0.85))
-                        }
-                        .help("Pindahkan ke Trash")
-                        .buttonStyle(.borderless)
                     }
-                    .padding(.vertical, 4)
+                    .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))
+                    .listRowSeparator(.hidden)
                 }
                 .listStyle(.inset)
             }
         }
     }
 }
-

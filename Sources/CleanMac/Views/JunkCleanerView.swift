@@ -21,24 +21,15 @@ public struct JunkCleanerView: View {
                         HStack(spacing: 5) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 11, weight: .semibold))
-                            Text("Dashboard")
-                                .font(.subheadline)
+                            Text(loc("action.back"))
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
 
                     Spacer()
 
                     if !viewModel.cleanableItems.isEmpty {
-                        HStack(spacing: 8) {
+                        HStack(spacing: 10) {
                             // Integrated Segmented Selection Pill
                             HStack(spacing: 0) {
                                 Button {
@@ -48,11 +39,11 @@ public struct JunkCleanerView: View {
                                         Image(systemName: "checkmark.circle.fill")
                                             .font(.system(size: 11))
                                             .foregroundColor(.blue)
-                                        Text("Semua")
-                                            .font(.subheadline)
+                                        Text(loc("action.selectAll"))
+                                            .font(.system(size: 12, weight: .medium))
                                     }
                                     .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
+                                    .padding(.vertical, 6)
                                 }
                                 .buttonStyle(.plain)
 
@@ -66,11 +57,11 @@ public struct JunkCleanerView: View {
                                         Image(systemName: "xmark.circle")
                                             .font(.system(size: 11))
                                             .foregroundColor(.secondary)
-                                        Text("Batal")
-                                            .font(.subheadline)
+                                        Text(loc("action.deselectAll"))
+                                            .font(.system(size: 12, weight: .medium))
                                     }
                                     .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
+                                    .padding(.vertical, 6)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -81,30 +72,17 @@ public struct JunkCleanerView: View {
                                     .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
                             )
 
-                            // Pro Red Delete Button
+                            // Pro Modern Red Delete Button
                             Button(role: .destructive) {
                                 showDeleteSelectedAlert = true
                             } label: {
                                 HStack(spacing: 6) {
                                     Image(systemName: "trash.fill")
                                         .font(.system(size: 12, weight: .semibold))
-                                    Text("Hapus Yang Dipilih")
-                                        .font(.system(size: 13, weight: .semibold))
+                                    Text(loc("action.deleteSelected"))
                                 }
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(
-                                            viewModel.selectedCleanableIDs.isEmpty
-                                            ? Color.gray.opacity(0.4)
-                                            : Color(red: 0.88, green: 0.22, blue: 0.22)
-                                        )
-                                )
-                                .shadow(color: viewModel.selectedCleanableIDs.isEmpty ? .clear : Color.red.opacity(0.25), radius: 4, x: 0, y: 2)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ModernPrimaryButtonStyle(isDestructive: true))
                             .disabled(viewModel.selectedCleanableIDs.isEmpty)
                         }
                     }
@@ -113,11 +91,11 @@ public struct JunkCleanerView: View {
                 // Row 2: Title & Metrics
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Pembersih File Aman Dihapus")
+                        Text(loc("header.junkCleaner"))
                             .font(.title2)
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        Text("Cache build, temporary log, package manager cache, dan installer sisa")
+                        Text(loc("header.junkCleanerSub"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
@@ -125,14 +103,14 @@ public struct JunkCleanerView: View {
 
                     Spacer()
 
-                    // Metrics badge (Matching DirectorySizesView)
+                    // Metrics badge
                     HStack(spacing: 12) {
                         VStack(alignment: .trailing, spacing: 1) {
                             Text(ByteFormatter.string(from: viewModel.selectedCleanableSize))
                                 .font(.system(.title3, design: .monospaced))
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
-                            Text("\(viewModel.selectedCleanableIDs.count) dari \(viewModel.cleanableItems.count) item dipilih")
+                            Text("\(viewModel.selectedCleanableIDs.count) \(loc("stat.from")) \(viewModel.cleanableItems.count) \(loc("stat.itemsSelected"))")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -149,7 +127,7 @@ public struct JunkCleanerView: View {
 
                 // Row 3: Safety Guide Legend Bar
                 HStack(spacing: 14) {
-                    Text("Panduan Keamanan:")
+                    Text(loc("guide.safetyTitle"))
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -158,7 +136,7 @@ public struct JunkCleanerView: View {
                         Image(systemName: "checkmark.shield.fill")
                             .font(.system(size: 11))
                             .foregroundColor(.green)
-                        Text("Aman Dihapus (Dipindahkan ke Trash)")
+                        Text(loc("guide.safeDelete"))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -167,7 +145,7 @@ public struct JunkCleanerView: View {
                         Image(systemName: "sparkles")
                             .font(.system(size: 11))
                             .foregroundColor(.blue)
-                        Text("Potensi Hemat: \(ByteFormatter.string(from: viewModel.totalCleanableSize))")
+                        Text("\(loc("guide.potentialSave")) \(ByteFormatter.string(from: viewModel.totalCleanableSize))")
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -185,14 +163,16 @@ public struct JunkCleanerView: View {
                     Image(systemName: "checkmark.seal.fill")
                         .font(.system(size: 56))
                         .foregroundColor(.green.opacity(0.8))
-                    Text(viewModel.isScanning ? "Sedang menganalisis file yang bisa dibersihkan..." : "Sistem Anda bersih! Tidak ada file sampah signifikan.")
+                    Text(viewModel.isScanning ? loc("empty.scanningJunk") : loc("empty.noJunk"))
                         .font(.headline)
                         .foregroundColor(.primary)
                     if !viewModel.isScanning {
-                        Button("Scan Ulang") {
+                        Button {
                             viewModel.startFullScan()
+                        } label: {
+                            Text(loc("action.rescan"))
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(ModernSecondaryButtonStyle(accentColor: .blue))
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -202,8 +182,12 @@ public struct JunkCleanerView: View {
                         let items = viewModel.cleanableItems.filter { $0.type == type }
                         if !items.isEmpty {
                             Section {
-                                ForEach(items) { item in
-                                    cleanableRow(item)
+                                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                                    ModernListRowContainer(index: index) {
+                                        cleanableRow(item)
+                                    }
+                                    .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))
+                                    .listRowSeparator(.hidden)
                                 }
                             } header: {
                                 HStack(spacing: 8) {
@@ -229,19 +213,19 @@ public struct JunkCleanerView: View {
             }
         }
         .confirmationDialog(
-            "Hapus File Terpilih?",
+            loc("dialog.deleteSelectedTitle"),
             isPresented: $showDeleteSelectedAlert,
             titleVisibility: .visible
         ) {
-            Button("Hapus Sekarang (\(ByteFormatter.string(from: viewModel.selectedCleanableSize)))", role: .destructive) {
+            Button("\(loc("action.deleteNow")) (\(ByteFormatter.string(from: viewModel.selectedCleanableSize)))", role: .destructive) {
                 viewModel.deleteSelectedCleanables()
             }
-            Button("Batal", role: .cancel) {}
+            Button(loc("action.cancel"), role: .cancel) {}
         } message: {
-            Text("File-file ini akan dihapus permanen untuk menghemat ruang disk Anda.")
+            Text(loc("dialog.deleteSelectedMsg"))
         }
         .confirmationDialog(
-            "Hapus Item Ini?",
+            loc("dialog.deleteItemTitle"),
             isPresented: Binding(
                 get: { itemToDelete != nil },
                 set: { if !$0 { itemToDelete = nil } }
@@ -249,12 +233,12 @@ public struct JunkCleanerView: View {
             titleVisibility: .visible,
             presenting: itemToDelete
         ) { item in
-            Button("Hapus '\(item.name)' (\(item.formattedSize))", role: .destructive) {
+            Button("\(loc("dialog.deleteItemTitle")) '\(item.name)' (\(item.formattedSize))", role: .destructive) {
                 viewModel.deleteCleanableItem(item)
             }
-            Button("Batal", role: .cancel) {}
+            Button(loc("action.cancel"), role: .cancel) {}
         } message: { item in
-            Text("Item ini akan dihapus dari sistem Anda.")
+            Text(loc("dialog.deleteItemMsg"))
         }
     }
 
@@ -287,7 +271,6 @@ public struct JunkCleanerView: View {
 
             Spacer()
 
-            // Relative visual size bar (matching DirectorySizesView)
             let maxSize = viewModel.cleanableItems.first?.size ?? 1
             let fraction = CGFloat(item.size) / CGFloat(max(1, maxSize))
             GeometryReader { geo in
@@ -308,19 +291,17 @@ public struct JunkCleanerView: View {
             } label: {
                 Image(systemName: "folder.badge.gearshape")
             }
-            .help("Buka di Finder")
-            .buttonStyle(.borderless)
+            .buttonStyle(ModernRowActionStyle(tint: .secondary))
+            .help(loc("help.openInFinder"))
 
             Button(role: .destructive) {
                 itemToDelete = item
             } label: {
                 Image(systemName: "trash")
-                    .foregroundColor(.red.opacity(0.85))
             }
-            .help("Hapus Item Ini")
-            .buttonStyle(.borderless)
+            .buttonStyle(ModernRowActionStyle(isDanger: true))
+            .help(loc("help.deleteItem"))
         }
         .padding(.vertical, 4)
     }
 }
-

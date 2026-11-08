@@ -16,7 +16,7 @@ public struct StorageBarView: View {
                 Label("Macintosh HD", systemImage: "internaldrive.fill")
                     .font(.headline)
                 Spacer()
-                Text("\(diskInfo.usedFormatted) of \(diskInfo.totalFormatted) used")
+                Text("\(diskInfo.usedFormatted) \(loc("bar.usedOf")) \(diskInfo.totalFormatted)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -52,7 +52,7 @@ public struct StorageBarView: View {
             }
             .frame(height: 20)
 
-            // Category legend with colored dots (like macOS System Settings)
+            // Category legend with colored dots
             if !categories.isEmpty {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 130), spacing: 8)], alignment: .leading, spacing: 6) {
                     ForEach(categories) { item in
@@ -60,7 +60,7 @@ public struct StorageBarView: View {
                             Circle()
                                 .fill(item.category.color)
                                 .frame(width: 8, height: 8)
-                            Text(item.category.rawValue)
+                            Text(item.category.localizedName)
                                 .font(.caption)
                                 .foregroundColor(.primary)
                             Text(item.formattedSize)
@@ -74,7 +74,7 @@ public struct StorageBarView: View {
                         Circle()
                             .fill(Color.secondary.opacity(0.4))
                             .frame(width: 8, height: 8)
-                        Text("Tersedia")
+                        Text(loc("bar.available"))
                             .font(.caption)
                             .foregroundColor(.primary)
                         Text(diskInfo.freeFormatted)
@@ -87,17 +87,17 @@ public struct StorageBarView: View {
                 HStack {
                     HStack(spacing: 6) {
                         Circle().fill(Color.blue).frame(width: 8, height: 8)
-                        Text("Terpakai: \(diskInfo.usedFormatted)")
+                        Text("\(loc("bar.used")): \(diskInfo.usedFormatted)")
                             .font(.caption)
                     }
                     Spacer()
                     HStack(spacing: 6) {
                         Circle().fill(Color.secondary.opacity(0.4)).frame(width: 8, height: 8)
-                        Text("Tersedia: \(diskInfo.freeFormatted)")
+                        Text("\(loc("bar.available")): \(diskInfo.freeFormatted)")
                             .font(.caption)
                     }
                     Spacer()
-                    Text("Total: \(diskInfo.totalFormatted)")
+                    Text("\(loc("bar.total")): \(diskInfo.totalFormatted)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

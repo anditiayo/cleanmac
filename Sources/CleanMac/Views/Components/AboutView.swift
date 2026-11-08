@@ -28,14 +28,14 @@ public struct AboutView: View {
                     .font(.title)
                     .fontWeight(.bold)
 
-                Text("Versi 1.0 (Build 1)")
+                Text(loc("about.version"))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
 
             // Developer Credit
             VStack(spacing: 6) {
-                Text("Dibuat dengan ❤️ oleh")
+                Text(loc("about.madeBy"))
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -50,7 +50,7 @@ public struct AboutView: View {
                 .padding(.horizontal, 20)
 
             // Description
-            Text("Penganalisis penyimpanan disk macOS, pendeteksi berkas besar, pembersih sampah sistem, dan uninstaller aplikasi tuntas.")
+            Text(loc("about.desc"))
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -66,14 +66,12 @@ public struct AboutView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "cup.and.saucer.fill")
                             .font(.system(size: 13, weight: .semibold))
-                        Text("Dukung Pengembang via PayPal")
+                        Text(loc("about.donate"))
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 7)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Color(red: 0.0, green: 0.45, blue: 0.85)) // PayPal Blue
+                .buttonStyle(ModernPrimaryButtonStyle(tintColor: Color(red: 0.0, green: 0.45, blue: 0.85)))
 
                 HStack(spacing: 10) {
                     Button {
@@ -84,18 +82,17 @@ public struct AboutView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "star.fill")
                                 .foregroundColor(.yellow)
-                            Text("Beri Bintang di GitHub")
+                            Text(loc("about.star"))
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 5)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(ModernSecondaryButtonStyle())
 
-                    Button("Tutup") {
+                    Button(loc("action.close")) {
                         dismiss()
                     }
                     .frame(width: 80)
-                    .buttonStyle(.bordered)
+                    .buttonStyle(ModernSecondaryButtonStyle())
                     .keyboardShortcut(.cancelAction)
                 }
             }
@@ -108,7 +105,6 @@ public struct AboutView: View {
                 .padding(.top, 4)
         }
         .padding(.vertical, 24)
-        .frame(width: 380)
+        .frame(width: 390)
     }
 }
-

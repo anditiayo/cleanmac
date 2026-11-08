@@ -21,25 +21,25 @@ public struct ScanPermissionSheet: View {
                     Circle()
                         .fill(
                             LinearGradient(
-                                colors: [Color.blue.opacity(0.8), Color.cyan.opacity(0.8)],
+                                colors: [Color.blue.opacity(0.85), Color.cyan.opacity(0.85)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 52, height: 52)
+                        .frame(width: 50, height: 50)
 
                     Image(systemName: "checkmark.shield.fill")
-                        .font(.system(size: 26))
+                        .font(.system(size: 24))
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
-                        Text("Izin Pemindaian")
+                        Text(loc("perm.title"))
                             .font(.title2)
                             .fontWeight(.bold)
 
-                        Text("Konfirmasi Sekali")
+                        Text(loc("perm.badge"))
                             .font(.caption2)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -48,7 +48,7 @@ public struct ScanPermissionSheet: View {
                             .cornerRadius(4)
                     }
 
-                    Text("Pilih modul & area yang diizinkan untuk dipindai oleh CleanMac:")
+                    Text(loc("perm.sub"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -56,6 +56,7 @@ public struct ScanPermissionSheet: View {
                 Spacer()
 
                 Button {
+                    viewModel.showScanPermissionSheet = false
                     dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -72,40 +73,40 @@ public struct ScanPermissionSheet: View {
             ScrollView {
                 VStack(spacing: 10) {
                     checklistRow(
-                        title: "Aplikasi & Uninstaller",
-                        description: "/Applications & ~/Applications — Ukuran app dan sisa berkas uninstaller",
+                        title: loc("perm.appsTitle"),
+                        description: loc("perm.appsDesc"),
                         icon: "app.badge.fill",
                         iconColor: .blue,
                         isOn: $permissions.scanApplications
                     )
 
                     checklistRow(
-                        title: "File Besar Pengguna",
-                        description: "Downloads, Dokumen, Desktop — Berkas besar berukuran >10 MB",
+                        title: loc("perm.filesTitle"),
+                        description: loc("perm.filesDesc"),
                         icon: "doc.badge.gearshape.fill",
                         iconColor: .green,
                         isOn: $permissions.scanLargeFiles
                     )
 
                     checklistRow(
-                        title: "Pembersih Sampah",
-                        description: "Trash, Cache Build (Xcode, npm, rust), Installer .dmg/.pkg sementara",
+                        title: loc("perm.junkTitle"),
+                        description: loc("perm.junkDesc"),
                         icon: "sparkles",
                         iconColor: .red,
                         isOn: $permissions.scanJunk
                     )
 
                     checklistRow(
-                        title: "Cache & Log Pengguna",
-                        description: "~/Library/Caches & ~/Library/Logs — File cache dan log sistem",
+                        title: loc("perm.cacheTitle"),
+                        description: loc("perm.cacheDesc"),
                         icon: "trash.fill",
                         iconColor: .purple,
                         isOn: $permissions.scanCaches
                     )
 
                     checklistRow(
-                        title: "Analisis Semua Folder (Deep Scan)",
-                        description: "Pemetaan mendalam hierarki direktori & indikator keamanan folder",
+                        title: loc("perm.deepTitle"),
+                        description: loc("perm.deepDesc"),
                         icon: "folder.badge.questionmark",
                         iconColor: .cyan,
                         isOn: $permissions.scanDeepDirectories
@@ -122,9 +123,10 @@ public struct ScanPermissionSheet: View {
                 HStack {
                     Toggle(isOn: $rememberChoice) {
                         HStack(spacing: 6) {
-                            Text("Ingat izin ini (muncul sekali saja)")
+                            Text(loc("perm.remember"))
                                 .font(.caption)
-                            Text("— Scan berikutnya akan langsung berjalan otomatis")
+                                .fontWeight(.medium)
+                            Text(loc("perm.rememberSub"))
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -135,26 +137,29 @@ public struct ScanPermissionSheet: View {
                 }
 
                 HStack {
-                    Button("Batal") {
+                    Button {
+                        viewModel.showScanPermissionSheet = false
                         dismiss()
+                    } label: {
+                        Text(loc("action.cancel"))
                     }
+                    .buttonStyle(ModernSecondaryButtonStyle())
                     .keyboardShortcut(.cancelAction)
 
                     Spacer()
 
                     Button {
                         viewModel.saveAndApplyPermissions(permissions, remember: rememberChoice)
+                        viewModel.showScanPermissionSheet = false
                         dismiss()
                         viewModel.startScanWithOptions()
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark.circle.fill")
-                            Text("Izinkan & Mulai Scan")
+                            Text(loc("action.allowAndScan"))
                         }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(ModernPrimaryButtonStyle(tintColor: .blue))
                     .disabled(!permissions.hasAnySelected)
                     .keyboardShortcut(.defaultAction)
                 }
@@ -220,4 +225,3 @@ public struct ScanPermissionSheet: View {
         .buttonStyle(.plain)
     }
 }
-

@@ -28,52 +28,94 @@ public struct MainContentView: View {
 
                 Divider()
 
-                // Settings Footer in Sidebar (Language & Theme)
-                VStack(spacing: 8) {
+                // Modern Preferences Footer in Sidebar (Language & Theme)
+                VStack(spacing: 10) {
+                    // Language Switcher Row
                     HStack(spacing: 8) {
-                        Text(selectedLanguage == .indonesian ? "Bahasa:" : "Language:")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                        Label {
+                            Text(loc("footer.language"))
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                        } icon: {
+                            Image(systemName: "globe")
+                                .font(.system(size: 11))
+                                .foregroundColor(.blue)
+                        }
 
-                        Picker("Bahasa", selection: $selectedLanguageRaw) {
+                        Spacer()
+
+                        Picker("", selection: $selectedLanguageRaw) {
                             ForEach(AppLanguage.allCases) { lang in
-                                Text("\(lang.flag) \(lang.shortLabel)").tag(lang.rawValue)
+                                Text("\(lang.flag) \(lang.shortLabel)")
+                                    .tag(lang.rawValue)
                             }
                         }
+                        .labelsHidden()
                         .pickerStyle(.segmented)
                         .controlSize(.small)
+                        .frame(width: 96)
                     }
 
+                    // Theme Switcher Row
                     HStack(spacing: 8) {
-                        Text(selectedLanguage == .indonesian ? "Tema:" : "Theme:")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                        Label {
+                            Text(loc("footer.theme"))
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                        } icon: {
+                            Image(systemName: "circle.lefthalf.filled")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                        }
 
-                        Picker("Tema", selection: $selectedThemeRaw) {
+                        Spacer()
+
+                        Picker("", selection: $selectedThemeRaw) {
                             ForEach(AppTheme.allCases) { theme in
                                 Image(systemName: theme.iconName).tag(theme.rawValue)
                             }
                         }
+                        .labelsHidden()
                         .pickerStyle(.segmented)
                         .controlSize(.small)
+                        .frame(width: 96)
                     }
 
+                    Divider()
+                        .padding(.vertical, 2)
+
+                    // About & Donate Pill Button
                     Button {
                         showAboutSheet = true
                     } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "info.circle")
-                            Text("Tentang & Donasi (Yogi Anditia)")
+                        HStack(spacing: 6) {
+                            Image(systemName: "info.circle.fill")
+                                .font(.system(size: 11))
+                                .foregroundColor(.blue)
+                            Text(loc("footer.about"))
+                                .font(.system(size: 10.5, weight: .medium))
+                                .foregroundColor(.primary.opacity(0.85))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                            Spacer()
                         }
-                        .font(.caption2)
-                        .foregroundColor(.blue)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color(nsColor: .controlBackgroundColor).opacity(0.6))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color(nsColor: .separatorColor).opacity(0.4), lineWidth: 0.5)
+                        )
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(10)
-                .background(Color(nsColor: .controlBackgroundColor).opacity(0.5))
+                .padding(12)
+                .background(Color(nsColor: .controlBackgroundColor).opacity(0.4))
             }
-            .navigationSplitViewColumnWidth(min: 190, ideal: 210, max: 250)
+            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {
             Group {
                 switch viewModel.selectedTab {
@@ -91,7 +133,8 @@ public struct MainContentView: View {
                     CacheListView(viewModel: viewModel)
                 }
             }
-            .frame(minWidth: 620, minHeight: 460)
+            .id(selectedLanguageRaw) // Forces full UI refresh on language change!
+            .frame(minWidth: 640, minHeight: 480)
         }
         .preferredColorScheme(selectedTheme.colorScheme)
         .sheet(isPresented: $showAboutSheet) {

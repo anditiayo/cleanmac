@@ -43,25 +43,16 @@ public struct FileListView: View {
                         HStack(spacing: 5) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 11, weight: .semibold))
-                            Text("Dashboard")
-                                .font(.subheadline)
+                            Text(loc("action.back"))
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
 
                     Spacer()
 
                     // Category Filter Dropdown
                     Menu {
-                        Button("Semua Kategori") {
+                        Button(loc("cat.all")) {
                             selectedCategory = nil
                         }
                         Divider()
@@ -69,36 +60,27 @@ public struct FileListView: View {
                             Button {
                                 selectedCategory = cat
                             } label: {
-                                Label(cat.rawValue, systemImage: cat.iconName)
+                                Label(cat.localizedName, systemImage: cat.iconName)
                             }
                         }
                     } label: {
                         HStack(spacing: 5) {
                             Image(systemName: selectedCategory == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                                 .foregroundColor(selectedCategory == nil ? .secondary : .blue)
-                            Text(selectedCategory?.rawValue ?? "Kategori")
-                                .font(.subheadline)
+                            Text(selectedCategory?.localizedName ?? loc("cat.title"))
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 9))
+                                .font(.system(size: 8))
                                 .foregroundColor(.secondary)
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
 
                     // Native Search Field
                     HStack(spacing: 6) {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
-                        TextField("Cari file...", text: $searchText)
+                        TextField(loc("search.file"), text: $searchText)
                             .textFieldStyle(.plain)
                             .font(.subheadline)
                         if !searchText.isEmpty {
@@ -129,29 +111,20 @@ public struct FileListView: View {
                         HStack(spacing: 5) {
                             Image(systemName: sortAscending ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
                                 .foregroundColor(.blue)
-                            Text(sortAscending ? "Terkecil" : "Terbesar")
-                                .font(.subheadline)
+                            Text(sortAscending ? loc("action.sortSmallest") : loc("action.sortLargest"))
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
                 }
 
                 // Row 2: Title & Metrics
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("File & Folder Besar")
+                        Text(loc("header.files"))
                             .font(.title2)
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        Text("Berkas pengguna (>10 MB) di Downloads, Dokumen, Desktop, Movies & Pictures")
+                        Text(loc("header.filesSub"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
@@ -166,7 +139,7 @@ public struct FileListView: View {
                                 .font(.system(.title3, design: .monospaced))
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
-                            Text("\(filteredFiles.count) file ditemukan")
+                            Text("\(filteredFiles.count) \(loc("stat.filesFound"))")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -183,7 +156,7 @@ public struct FileListView: View {
 
                 // Row 3: Guide Legend Bar
                 HStack(spacing: 14) {
-                    Text("Petunjuk:")
+                    Text(loc("guide.hint"))
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -192,7 +165,7 @@ public struct FileListView: View {
                         Image(systemName: "space")
                             .font(.system(size: 11))
                             .foregroundColor(.blue)
-                        Text("Tekan Spasi untuk Pratinjau Cepat (Quick Look)")
+                        Text(loc("guide.quickLook"))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -201,7 +174,7 @@ public struct FileListView: View {
                         Image(systemName: "eye.fill")
                             .font(.system(size: 11))
                             .foregroundColor(.purple)
-                        Text("Ikon Mata untuk Buka Detail & Folder")
+                        Text(loc("guide.eyeIcon"))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -219,100 +192,100 @@ public struct FileListView: View {
                     Image(systemName: "doc.badge.gearshape.fill")
                         .font(.system(size: 48))
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text(viewModel.isScanning ? "Sedang memindai file besar..." : "Tidak ada file besar ditemukan.")
+                    Text(viewModel.isScanning ? loc("empty.scanningFiles") : loc("empty.noFilesFound"))
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(filteredFiles) { file in
-                    HStack(spacing: 14) {
-                        Image(nsImage: file.icon)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 36, height: 36)
+                List(Array(filteredFiles.enumerated()), id: \.element.id) { index, file in
+                    ModernListRowContainer(index: index) {
+                        HStack(spacing: 14) {
+                            Image(nsImage: file.icon)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 36, height: 36)
 
-                        VStack(alignment: .leading, spacing: 3) {
-                            HStack(spacing: 6) {
-                                Text(file.name)
-                                    .font(.body)
-                                    .fontWeight(.medium)
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 6) {
+                                    Text(file.name)
+                                        .font(.body)
+                                        .fontWeight(.medium)
 
-                                Text(file.category.rawValue)
+                                    Text(file.category.localizedName)
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(file.category.color.opacity(0.15))
+                                        .foregroundColor(file.category.color)
+                                        .cornerRadius(4)
+                                }
+
+                                Text(file.url.path)
                                     .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(file.category.color.opacity(0.15))
-                                    .foregroundColor(file.category.color)
-                                    .cornerRadius(4)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
                             }
 
-                            Text(file.url.path)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
+                            Spacer()
+
+                            let maxSize = filteredFiles.first?.size ?? 1
+                            let fraction = CGFloat(file.size) / CGFloat(maxSize)
+                            GeometryReader { geo in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(file.category.color.opacity(0.35))
+                                    .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                    .frame(maxHeight: .infinity, alignment: .center)
+                            }
+                            .frame(width: 80, height: 20)
+
+                            Text(file.formattedSize)
+                                .font(.system(.body, design: .monospaced))
+                                .fontWeight(.semibold)
+                                .frame(width: 85, alignment: .trailing)
+
+                            Button {
+                                selectedFileForPreview = file
+                            } label: {
+                                Image(systemName: "eye")
+                            }
+                            .buttonStyle(ModernRowActionStyle(tint: .blue))
+                            .help(loc("help.quickLook"))
+
+                            Button {
+                                viewModel.revealInFinder(url: file.url)
+                            } label: {
+                                Image(systemName: "folder.badge.gearshape")
+                            }
+                            .buttonStyle(ModernRowActionStyle(tint: .secondary))
+                            .help(loc("help.showInFinder"))
+
+                            Button(role: .destructive) {
+                                itemToTrash = file
+                                showTrashConfirm = true
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                            .buttonStyle(ModernRowActionStyle(isDanger: true))
+                            .help(loc("help.moveToTrash"))
                         }
-
-                        Spacer()
-
-                        // Relative visual size bar (matching DirectorySizesView)
-                        let maxSize = filteredFiles.first?.size ?? 1
-                        let fraction = CGFloat(file.size) / CGFloat(maxSize)
-                        GeometryReader { geo in
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(file.category.color.opacity(0.35))
-                                .frame(width: max(4, geo.size.width * fraction), height: 8)
-                                .frame(maxHeight: .infinity, alignment: .center)
-                        }
-                        .frame(width: 80, height: 20)
-
-                        Text(file.formattedSize)
-                            .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .frame(width: 85, alignment: .trailing)
-
-                        Button {
-                            selectedFileForPreview = file
-                        } label: {
-                            Image(systemName: "eye")
-                                .foregroundColor(.blue)
-                        }
-                        .help("Quick Look / Pratinjau (Spasi)")
-                        .buttonStyle(.borderless)
-
-                        Button {
-                            viewModel.revealInFinder(url: file.url)
-                        } label: {
-                            Image(systemName: "folder.badge.gearshape")
-                        }
-                        .help("Tampilkan di Finder")
-                        .buttonStyle(.borderless)
-
-                        Button(role: .destructive) {
-                            itemToTrash = file
-                            showTrashConfirm = true
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red.opacity(0.85))
-                        }
-                        .help("Pindahkan ke Trash")
-                        .buttonStyle(.borderless)
                     }
-                    .padding(.vertical, 4)
+                    .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))
+                    .listRowSeparator(.hidden)
                 }
                 .listStyle(.inset)
                 .confirmationDialog(
-                    "Pindahkan ke Trash?",
+                    loc("dialog.moveToTrash"),
                     isPresented: $showTrashConfirm,
                     titleVisibility: .visible,
                     presenting: itemToTrash
                 ) { item in
-                    Button("Pindahkan ke Trash (\(item.formattedSize))", role: .destructive) {
+                    Button("\(loc("dialog.moveToTrashBtn")) (\(item.formattedSize))", role: .destructive) {
                         _ = viewModel.moveToTrash(url: item.url)
                     }
-                    Button("Batal", role: .cancel) {}
+                    Button(loc("action.cancel"), role: .cancel) {}
                 } message: { item in
-                    Text("Apakah Anda yakin ingin memindahkan '\(item.name)' ke Trash?")
+                    Text("\(loc("dialog.fileConfirm")) '\(item.name)'?")
                 }
                 .sheet(item: $selectedFileForPreview) { targetFile in
                     FileDetailSheet(file: targetFile) {
@@ -334,4 +307,3 @@ public struct FileListView: View {
         }
     }
 }
-

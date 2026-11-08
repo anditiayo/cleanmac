@@ -38,7 +38,7 @@ public struct AppUninstallerSheet: View {
                         Text(app.name)
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("Uninstaller Tuntas")
+                        Text(loc("uninst.badge"))
                             .font(.caption2)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -72,7 +72,7 @@ public struct AppUninstallerSheet: View {
             if isLoading {
                 VStack(spacing: 12) {
                     ProgressView()
-                    Text("Memindai data & file sisa aplikasi...")
+                    Text(loc("uninst.scanning"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -81,7 +81,7 @@ public struct AppUninstallerSheet: View {
             } else {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Daftar Berkas yang Akan Dihapus:")
+                        Text(loc("uninst.fileListTitle"))
                             .font(.headline)
                         Spacer()
                         Text("Total: \(ByteFormatter.string(from: selectedTotalBytes))")
@@ -103,7 +103,7 @@ public struct AppUninstallerSheet: View {
                                     .frame(width: 24, height: 24)
 
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Aplikasi Utama (\(app.name))")
+                                    Text("\(loc("uninst.mainApp")) (\(app.name))")
                                         .font(.body)
                                         .fontWeight(.medium)
                                     Text(app.url.path)
@@ -121,7 +121,7 @@ public struct AppUninstallerSheet: View {
                             }
                             .padding(.vertical, 2)
                         } header: {
-                            Text("Aplikasi Utama")
+                            Text(loc("uninst.mainApp"))
                         }
 
                         // 2. Leftovers (App Support, Caches, Preferences, etc.)
@@ -173,9 +173,9 @@ public struct AppUninstallerSheet: View {
                                 }
                             } header: {
                                 HStack {
-                                    Text("Data Terkait & File Sisa (\(leftovers.count) item)")
+                                    Text("\(loc("uninst.leftovers")) (\(leftovers.count) item)")
                                     Spacer()
-                                    Button("Pilih Semua") {
+                                    Button(loc("action.selectAll")) {
                                         selectedLeftoverIDs = Set(leftovers.map { $0.id })
                                     }
                                     .buttonStyle(.plain)
@@ -185,7 +185,7 @@ public struct AppUninstallerSheet: View {
                             }
                         } else {
                             Section {
-                                Text("Tidak ada file sisa tersembunyi ditemukan di Library.")
+                                Text(loc("uninst.noLeftovers"))
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -198,7 +198,7 @@ public struct AppUninstallerSheet: View {
 
             Divider()
 
-            // Action Footer
+            // Action Footer with Modern Buttons
             HStack(spacing: 14) {
                 if let msg = statusMessage {
                     Text(msg)
@@ -208,26 +208,25 @@ public struct AppUninstallerSheet: View {
 
                 Spacer()
 
-                Button("Batal") {
+                Button(loc("action.cancel")) {
                     dismiss()
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(ModernSecondaryButtonStyle())
 
                 Button(role: .destructive) {
                     performUninstall()
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "trash.fill")
-                        Text("Uninstall Tuntas (\(ByteFormatter.string(from: selectedTotalBytes)))")
+                        Text("\(loc("uninst.uninstallBtn")) (\(ByteFormatter.string(from: selectedTotalBytes)))")
                     }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
+                .buttonStyle(ModernPrimaryButtonStyle(isDestructive: true))
                 .disabled(isUninstalling || isLoading)
             }
             .padding(18)
         }
-        .frame(width: 580, height: 440)
+        .frame(width: 600, height: 450)
         .onAppear {
             scanForLeftovers()
         }
@@ -247,7 +246,7 @@ public struct AppUninstallerSheet: View {
 
     private func performUninstall() {
         isUninstalling = true
-        statusMessage = "Menghapus aplikasi dan data terkait..."
+        statusMessage = loc("uninst.removing")
 
         let selectedLeftovers = leftovers.filter { selectedLeftoverIDs.contains($0.id) }
         let package = CompleteAppPackage(id: app.id, app: app, leftovers: selectedLeftovers)
@@ -266,4 +265,3 @@ public struct AppUninstallerSheet: View {
         }
     }
 }
-

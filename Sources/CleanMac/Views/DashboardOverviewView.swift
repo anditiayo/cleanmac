@@ -22,7 +22,7 @@ public struct DashboardOverviewView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("CleanMac Storage")
+                        Text(loc("dash.title"))
                             .font(.title2)
                             .fontWeight(.bold)
                         Text(viewModel.currentStatus)
@@ -45,7 +45,7 @@ public struct DashboardOverviewView: View {
                                     Image(systemName: "sparkle.magnifyingglass")
                                         .font(.system(size: 16, weight: .bold))
                                 }
-                                Text(viewModel.isScanning ? "SCANNING..." : "SCAN")
+                                Text(viewModel.isScanning ? loc("action.scanning") : loc("action.scan"))
                                     .font(.system(size: 15, weight: .bold, design: .rounded))
                                     .tracking(0.5)
                             }
@@ -75,24 +75,23 @@ public struct DashboardOverviewView: View {
                             viewModel.showScanPermissionSheet = true
                         } label: {
                             Image(systemName: "slider.horizontal.3")
-                                .font(.system(size: 14, weight: .semibold))
-                                .frame(height: 22)
+                                .font(.system(size: 13, weight: .semibold))
+                                .frame(height: 20)
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.regular)
-                        .help("Atur Izin & Opsi Pemindaian...")
+                        .buttonStyle(ModernSecondaryButtonStyle())
+                        .help(loc("help.scanSettings"))
                     }
                 }
 
-                // 1. Storage Bar (Divided by category colors like macOS Settings)
+                // 1. Storage Bar
                 StorageBarView(diskInfo: viewModel.diskInfo, categories: viewModel.categoryUsages)
 
                 // 2. Quick Stat Cards - Symmetrical 3x2 Grid
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                     StatCard(
-                        title: "Semua Folder",
+                        title: loc("dash.cardAllFolders"),
                         value: ByteFormatter.string(from: viewModel.totalDirectorySizesScanned),
-                        subtitle: "\(viewModel.directorySizes.count) folder dianalisis",
+                        subtitle: "\(viewModel.directorySizes.count) \(loc("stat.foldersAnalyzed"))",
                         icon: "folder.badge.questionmark",
                         color: .cyan
                     ) {
@@ -100,9 +99,9 @@ public struct DashboardOverviewView: View {
                     }
 
                     StatCard(
-                        title: "Bisa Dihapus",
+                        title: loc("dash.cardCleanable"),
                         value: ByteFormatter.string(from: viewModel.totalCleanableSize),
-                        subtitle: "\(viewModel.cleanableItems.count) item sampah",
+                        subtitle: "\(viewModel.cleanableItems.count) \(loc("stat.junkItems"))",
                         icon: "sparkles",
                         color: .red
                     ) {
@@ -110,9 +109,9 @@ public struct DashboardOverviewView: View {
                     }
 
                     StatCard(
-                        title: "Aplikasi",
+                        title: loc("dash.cardApps"),
                         value: ByteFormatter.string(from: viewModel.totalAppsSize),
-                        subtitle: "\(viewModel.applications.count) apps terdeteksi",
+                        subtitle: "\(viewModel.applications.count) \(loc("stat.appsDetected"))",
                         icon: "app.badge.fill",
                         color: .blue
                     ) {
@@ -120,9 +119,9 @@ public struct DashboardOverviewView: View {
                     }
 
                     StatCard(
-                        title: "File Besar",
+                        title: loc("dash.cardLargeFiles"),
                         value: ByteFormatter.string(from: viewModel.totalLargeFilesSize),
-                        subtitle: "\(viewModel.largeFiles.count) file (>10MB)",
+                        subtitle: "\(viewModel.largeFiles.count) \(loc("stat.filesDetected"))",
                         icon: "doc.badge.gearshape.fill",
                         color: .green
                     ) {
@@ -130,9 +129,9 @@ public struct DashboardOverviewView: View {
                     }
 
                     StatCard(
-                        title: "Cache & Logs",
+                        title: loc("dash.cardCaches"),
                         value: ByteFormatter.string(from: viewModel.totalCachesSize),
-                        subtitle: "\(viewModel.cacheFiles.count) folder cache",
+                        subtitle: "\(viewModel.cacheFiles.count) \(loc("stat.cacheFolders"))",
                         icon: "trash.fill",
                         color: .orange
                     ) {
@@ -140,9 +139,9 @@ public struct DashboardOverviewView: View {
                     }
 
                     StatCard(
-                        title: "System Data",
+                        title: loc("dash.cardSystemData"),
                         value: ByteFormatter.string(from: viewModel.systemDataSize),
-                        subtitle: "macOS & sistem",
+                        subtitle: loc("stat.macosSystem"),
                         icon: "internaldrive.fill",
                         color: .gray
                     ) {
@@ -168,15 +167,19 @@ public struct DashboardOverviewView: View {
                 if !viewModel.applications.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Text("Top 5 Aplikasi Terbesar")
+                            Text(loc("dash.topApps"))
                                 .font(.headline)
                             Spacer()
-                            Button("Lihat Semua") {
+                            Button {
                                 viewModel.selectedTab = .apps
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(loc("action.seeAll"))
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 9, weight: .semibold))
+                                }
                             }
-                            .buttonStyle(.plain)
-                            .foregroundColor(.blue)
-                            .font(.subheadline)
+                            .buttonStyle(ModernSecondaryButtonStyle(accentColor: .blue))
                         }
 
                         VStack(spacing: 8) {
@@ -211,15 +214,19 @@ public struct DashboardOverviewView: View {
                 if !viewModel.largeFiles.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Text("Top 5 File / Data Terbesar")
+                            Text(loc("dash.topFiles"))
                                 .font(.headline)
                             Spacer()
-                            Button("Lihat Semua") {
+                            Button {
                                 viewModel.selectedTab = .files
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(loc("action.seeAll"))
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 9, weight: .semibold))
+                                }
                             }
-                            .buttonStyle(.plain)
-                            .foregroundColor(.blue)
-                            .font(.subheadline)
+                            .buttonStyle(ModernSecondaryButtonStyle(accentColor: .blue))
                         }
 
                         VStack(spacing: 8) {
@@ -232,7 +239,7 @@ public struct DashboardOverviewView: View {
                                         Text(file.name)
                                             .font(.body)
                                             .lineLimit(1)
-                                        Text(file.category.rawValue)
+                                        Text(file.category.localizedName)
                                             .font(.caption2)
                                             .foregroundColor(file.category.color)
                                     }
@@ -312,4 +319,3 @@ private struct StatCard: View {
         .buttonStyle(.plain)
     }
 }
-

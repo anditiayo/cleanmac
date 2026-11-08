@@ -35,19 +35,10 @@ public struct AppListView: View {
                         HStack(spacing: 5) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 11, weight: .semibold))
-                            Text("Dashboard")
-                                .font(.subheadline)
+                            Text(loc("action.back"))
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
 
                     Spacer()
 
@@ -56,7 +47,7 @@ public struct AppListView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
-                        TextField("Cari aplikasi...", text: $searchText)
+                        TextField(loc("search.app"), text: $searchText)
                             .textFieldStyle(.plain)
                             .font(.subheadline)
                         if !searchText.isEmpty {
@@ -87,29 +78,20 @@ public struct AppListView: View {
                         HStack(spacing: 5) {
                             Image(systemName: sortAscending ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
                                 .foregroundColor(.blue)
-                            Text(sortAscending ? "Terkecil" : "Terbesar")
-                                .font(.subheadline)
+                            Text(sortAscending ? loc("action.sortSmallest") : loc("action.sortLargest"))
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color(nsColor: .controlBackgroundColor))
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                        )
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ModernSecondaryButtonStyle())
                 }
 
                 // Row 2: Title & Metrics
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Aplikasi Terinstal")
+                        Text(loc("header.apps"))
                             .font(.title2)
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        Text("Kelola aplikasi terpasang & copot sisa berkas secara tuntas (Uninstaller)")
+                        Text(loc("header.appsSub"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
@@ -124,7 +106,7 @@ public struct AppListView: View {
                                 .font(.system(.title3, design: .monospaced))
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
-                            Text("\(filteredApps.count) aplikasi terdeteksi")
+                            Text("\(filteredApps.count) \(loc("stat.appsFound"))")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -141,7 +123,7 @@ public struct AppListView: View {
 
                 // Row 3: Guide Legend Bar
                 HStack(spacing: 14) {
-                    Text("Fitur Uninstaller:")
+                    Text(loc("guide.uninstallerFeature"))
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -150,7 +132,7 @@ public struct AppListView: View {
                         Image(systemName: "trash.circle.fill")
                             .font(.system(size: 11))
                             .foregroundColor(.red)
-                        Text("Copot Bersih Termasuk Berkas Sisa di ~/Library")
+                        Text(loc("guide.uninstaller"))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -159,7 +141,7 @@ public struct AppListView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 11))
                             .foregroundColor(.blue)
-                        Text("Deteksi Otomatis Ukuran & Bundle ID")
+                        Text(loc("guide.autoDetect"))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
@@ -177,84 +159,85 @@ public struct AppListView: View {
                     Image(systemName: "app.badge.fill")
                         .font(.system(size: 48))
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text(viewModel.isScanning ? "Sedang memindai aplikasi..." : "Tidak ada aplikasi ditemukan.")
+                    Text(viewModel.isScanning ? loc("empty.scanningApps") : loc("empty.noAppsFound"))
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(filteredApps) { app in
-                    HStack(spacing: 14) {
-                        Image(nsImage: app.icon)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 40, height: 40)
+                List(Array(filteredApps.enumerated()), id: \.element.id) { index, app in
+                    ModernListRowContainer(index: index) {
+                        HStack(spacing: 14) {
+                            Image(nsImage: app.icon)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 40, height: 40)
 
-                        VStack(alignment: .leading, spacing: 3) {
-                            HStack(spacing: 6) {
-                                Text(app.name)
-                                    .font(.body)
-                                    .fontWeight(.medium)
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 6) {
+                                    Text(app.name)
+                                        .font(.body)
+                                        .fontWeight(.medium)
 
-                                Text("Aplikasi")
+                                    Text(loc("tag.app"))
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.blue.opacity(0.15))
+                                        .foregroundColor(.blue)
+                                        .cornerRadius(4)
+
+                                    Text(loc("tag.uninstaller"))
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.purple.opacity(0.15))
+                                        .foregroundColor(.purple)
+                                        .cornerRadius(4)
+                                }
+
+                                Text(app.url.path)
                                     .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.blue.opacity(0.15))
-                                    .foregroundColor(.blue)
-                                    .cornerRadius(4)
-
-                                Text("Uninstaller")
-                                    .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.purple.opacity(0.15))
-                                    .foregroundColor(.purple)
-                                    .cornerRadius(4)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
                             }
 
-                            Text(app.url.path)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
+                            Spacer()
+
+                            let maxSize = filteredApps.first?.size ?? 1
+                            let fraction = CGFloat(app.size) / CGFloat(maxSize)
+                            GeometryReader { geo in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color.blue.opacity(0.35))
+                                    .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                    .frame(maxHeight: .infinity, alignment: .center)
+                            }
+                            .frame(width: 80, height: 20)
+
+                            Text(app.formattedSize)
+                                .font(.system(.body, design: .monospaced))
+                                .fontWeight(.semibold)
+                                .frame(width: 85, alignment: .trailing)
+
+                            Button {
+                                viewModel.revealInFinder(url: app.url)
+                            } label: {
+                                Image(systemName: "folder.badge.gearshape")
+                            }
+                            .buttonStyle(ModernRowActionStyle(tint: .secondary))
+                            .help(loc("help.showInFinder"))
+
+                            Button(role: .destructive) {
+                                appToUninstall = app
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                            .buttonStyle(ModernRowActionStyle(isDanger: true))
+                            .help(loc("help.uninstallClean"))
                         }
-
-                        Spacer()
-
-                        // Relative visual size bar (matching DirectorySizesView)
-                        let maxSize = filteredApps.first?.size ?? 1
-                        let fraction = CGFloat(app.size) / CGFloat(maxSize)
-                        GeometryReader { geo in
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.blue.opacity(0.35))
-                                .frame(width: max(4, geo.size.width * fraction), height: 8)
-                                .frame(maxHeight: .infinity, alignment: .center)
-                        }
-                        .frame(width: 80, height: 20)
-
-                        Text(app.formattedSize)
-                            .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .frame(width: 85, alignment: .trailing)
-
-                        Button {
-                            viewModel.revealInFinder(url: app.url)
-                        } label: {
-                            Image(systemName: "folder.badge.gearshape")
-                        }
-                        .help("Tampilkan di Finder")
-                        .buttonStyle(.borderless)
-
-                        Button(role: .destructive) {
-                            appToUninstall = app
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red.opacity(0.85))
-                        }
-                        .help("Uninstall Tuntas (Hapus Aplikasi & Semua Data Terkait)")
-                        .buttonStyle(.borderless)
                     }
-                    .padding(.vertical, 4)
+                    .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))
+                    .listRowSeparator(.hidden)
                 }
                 .listStyle(.inset)
                 .sheet(item: $appToUninstall) { targetApp in
@@ -267,4 +250,3 @@ public struct AppListView: View {
         }
     }
 }
-

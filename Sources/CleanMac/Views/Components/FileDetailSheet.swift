@@ -30,7 +30,7 @@ public struct FileDetailSheet: View {
                         .lineLimit(1)
 
                     HStack(spacing: 6) {
-                        Text(file.category.rawValue)
+                        Text(file.category.localizedName)
                             .font(.caption2)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -38,7 +38,7 @@ public struct FileDetailSheet: View {
                             .foregroundColor(file.category.color)
                             .cornerRadius(4)
 
-                        Text(file.isDirectory ? "Folder / Direktori" : "Berkas (File)")
+                        Text(file.isDirectory ? loc("tag.directory") : loc("tag.file"))
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -60,20 +60,20 @@ public struct FileDetailSheet: View {
 
             // Details Table
             VStack(spacing: 10) {
-                DetailRow(title: "Ukuran", value: file.formattedSize, isMonospace: true)
-                DetailRow(title: "Lokasi", value: file.url.path, isMonospace: false, isPath: true)
+                DetailRow(title: loc("file.size"), value: file.formattedSize, isMonospace: true)
+                DetailRow(title: loc("file.location"), value: file.url.path, isMonospace: false, isPath: true)
 
                 if let modDate = file.modificationDate {
                     DetailRow(
-                        title: "Terakhir Diubah",
+                        title: loc("file.lastModified"),
                         value: modDate.formatted(date: .long, time: .shortened),
                         isMonospace: false
                     )
                 }
 
                 DetailRow(
-                    title: "Ekstensi",
-                    value: file.url.pathExtension.isEmpty ? "(Folder / Tanpa ekstensi)" : ".\(file.url.pathExtension)",
+                    title: loc("file.extension"),
+                    value: file.url.pathExtension.isEmpty ? "(\(loc("tag.noExtension")))" : ".\(file.url.pathExtension)",
                     isMonospace: true
                 )
             }
@@ -83,21 +83,29 @@ public struct FileDetailSheet: View {
 
             Spacer()
 
-            // Action Buttons
-            HStack(spacing: 12) {
+            // Redesigned Modern Action Buttons (Clear, Un-truncated, Distinct)
+            HStack(spacing: 10) {
                 Button {
                     NSWorkspace.shared.open(file.url)
                 } label: {
-                    Label("Buka Berkas", systemImage: "arrow.up.right.square")
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text(loc("action.openFile"))
+                    }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(ModernSecondaryButtonStyle(accentColor: .blue))
 
                 Button {
                     onReveal()
                 } label: {
-                    Label("Tampilkan di Finder", systemImage: "folder")
+                    HStack(spacing: 6) {
+                        Image(systemName: "folder")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text(loc("action.showInFinder"))
+                    }
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(ModernSecondaryButtonStyle())
 
                 Spacer()
 
@@ -105,14 +113,17 @@ public struct FileDetailSheet: View {
                     dismiss()
                     onTrash()
                 } label: {
-                    Label("Pindahkan ke Trash", systemImage: "trash")
+                    HStack(spacing: 6) {
+                        Image(systemName: "trash.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text(loc("action.moveToTrash"))
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.red)
+                .buttonStyle(ModernPrimaryButtonStyle(isDestructive: true))
             }
         }
         .padding(24)
-        .frame(width: 520, height: 350)
+        .frame(width: 560, height: 350)
     }
 }
 
@@ -149,4 +160,3 @@ private struct DetailRow: View {
         }
     }
 }
-

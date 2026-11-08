@@ -56,19 +56,10 @@ public struct DirectorySizesView: View {
                             HStack(spacing: 5) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 11, weight: .semibold))
-                                Text("Dashboard")
-                                    .font(.subheadline)
+                                Text(loc("action.back"))
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                            .cornerRadius(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                            )
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(ModernSecondaryButtonStyle())
                     } else {
                         Button {
                             navigationStack.removeLast()
@@ -81,23 +72,17 @@ public struct DirectorySizesView: View {
                             HStack(spacing: 5) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 11, weight: .semibold))
-                                Text("Kembali")
-                                    .font(.subheadline)
+                                Text(loc("action.backFolder"))
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color.blue.opacity(0.12))
-                            .foregroundColor(.blue)
-                            .cornerRadius(8)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(ModernSecondaryButtonStyle(accentColor: .blue))
                     }
 
-                    // Breadcrumb Path (when inside subfolders)
+                    // Breadcrumb Path
                     if !navigationStack.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 4) {
-                                Button("Semua Folder") {
+                                Button(loc("nav.allFolders")) {
                                     navigationStack.removeAll()
                                     currentSubitems = []
                                 }
@@ -120,10 +105,10 @@ public struct DirectorySizesView: View {
 
                     Spacer()
 
-                    // Category Filter Menu (Pro Dropdown)
+                    // Category Filter Menu
                     if navigationStack.isEmpty {
                         Menu {
-                            Button("Semua Kategori") {
+                            Button(loc("cat.all")) {
                                 selectedCategory = nil
                             }
                             Divider()
@@ -131,29 +116,20 @@ public struct DirectorySizesView: View {
                                 Button {
                                     selectedCategory = cat
                                 } label: {
-                                    Label(cat.rawValue, systemImage: cat.iconName)
+                                    Label(cat.localizedName, systemImage: cat.iconName)
                                 }
                             }
                         } label: {
                             HStack(spacing: 5) {
                                 Image(systemName: selectedCategory == nil ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                                     .foregroundColor(selectedCategory == nil ? .secondary : .blue)
-                                Text(selectedCategory?.rawValue ?? "Kategori")
-                                    .font(.subheadline)
+                                Text(selectedCategory?.localizedName ?? loc("cat.title"))
                                 Image(systemName: "chevron.down")
-                                    .font(.system(size: 9))
+                                    .font(.system(size: 8))
                                     .foregroundColor(.secondary)
                             }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                            .cornerRadius(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                            )
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(ModernSecondaryButtonStyle())
                     }
 
                     // Native-styled Search Field
@@ -161,7 +137,7 @@ public struct DirectorySizesView: View {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 12))
                             .foregroundColor(.secondary)
-                        TextField("Cari folder...", text: $searchText)
+                        TextField(loc("search.folder"), text: $searchText)
                             .textFieldStyle(.plain)
                             .font(.subheadline)
                         if !searchText.isEmpty {
@@ -186,14 +162,14 @@ public struct DirectorySizesView: View {
                     )
                 }
 
-                // Row 2: Clean Page Title & Stats Badge
+                // Row 2: Page Title & Stats Badge
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(navigationStack.isEmpty ? "Semua Folder & System Data" : navigationStack.last!.name)
+                        Text(navigationStack.isEmpty ? loc("header.allFolders") : navigationStack.last!.name)
                             .font(.title2)
                             .fontWeight(.bold)
                             .lineLimit(1)
-                        Text(navigationStack.isEmpty ? "Analisis seluruh penggunaan direktori di sistem" : navigationStack.last!.url.path)
+                        Text(navigationStack.isEmpty ? loc("header.allFoldersSub") : navigationStack.last!.url.path)
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
@@ -209,7 +185,7 @@ public struct DirectorySizesView: View {
                                 .font(.system(.title3, design: .monospaced))
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
-                            Text("\(currentItems.count) folder dianalisis")
+                            Text("\(currentItems.count) \(loc("stat.foldersAnalyzed"))")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
@@ -226,7 +202,7 @@ public struct DirectorySizesView: View {
 
                 // Safety Guide Legend Bar
                 HStack(spacing: 14) {
-                    Text("Panduan Keamanan:")
+                    Text(loc("guide.safetyTitle"))
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
@@ -234,7 +210,7 @@ public struct DirectorySizesView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "checkmark.shield.fill")
                             .foregroundColor(.green)
-                        Text("Aman Dihapus")
+                        Text(loc("guide.safe"))
                             .foregroundColor(.secondary)
                     }
                     .font(.caption2)
@@ -242,7 +218,7 @@ public struct DirectorySizesView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(.orange)
-                        Text("Hati-hati (Data Pengguna)")
+                        Text(loc("guide.caution"))
                             .foregroundColor(.secondary)
                     }
                     .font(.caption2)
@@ -250,7 +226,7 @@ public struct DirectorySizesView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "lock.shield.fill")
                             .foregroundColor(.red)
-                        Text("Proteksi Sistem")
+                        Text(loc("guide.critical"))
                             .foregroundColor(.secondary)
                     }
                     .font(.caption2)
@@ -273,7 +249,7 @@ public struct DirectorySizesView: View {
             if isLoadingSubitems {
                 VStack(spacing: 12) {
                     ProgressView()
-                    Text("Menghitung ukuran subfolder...")
+                    Text(loc("empty.loadingSubfolder"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -283,149 +259,150 @@ public struct DirectorySizesView: View {
                     Image(systemName: "folder.badge.questionmark")
                         .font(.system(size: 48))
                         .foregroundColor(.secondary.opacity(0.5))
-                    Text(viewModel.isScanning ? "Sedang memindai semua folder..." : "Tidak ada folder yang cocok.")
+                    Text(viewModel.isScanning ? loc("empty.scanningFolders") : loc("empty.noFolderMatch"))
                         .foregroundColor(.secondary)
                     if !viewModel.isScanning && navigationStack.isEmpty {
-                        Button("Mulai Scan") {
+                        Button {
                             viewModel.startFullScan()
+                        } label: {
+                            Text(loc("action.startScan"))
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(ModernPrimaryButtonStyle())
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(currentItems) { dir in
-                    HStack(spacing: 14) {
-                        Image(systemName: dir.hasChildren ? "folder.fill" : dir.category.iconName)
-                            .foregroundColor(dir.category.color)
-                            .font(.title3)
-                            .frame(width: 30)
+                List(Array(currentItems.enumerated()), id: \.element.id) { index, dir in
+                    ModernListRowContainer(index: index) {
+                        HStack(spacing: 14) {
+                            Image(systemName: dir.hasChildren ? "folder.fill" : dir.category.iconName)
+                                .foregroundColor(dir.category.color)
+                                .font(.title3)
+                                .frame(width: 30)
 
-                        VStack(alignment: .leading, spacing: 3) {
-                            HStack(spacing: 6) {
-                                Text(dir.name)
-                                    .font(.body)
-                                    .fontWeight(.medium)
+                            VStack(alignment: .leading, spacing: 3) {
+                                HStack(spacing: 6) {
+                                    Text(dir.name)
+                                        .font(.body)
+                                        .fontWeight(.medium)
 
-                                Text(dir.category.rawValue)
-                                    .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(dir.category.color.opacity(0.15))
-                                    .foregroundColor(dir.category.color)
-                                    .cornerRadius(4)
-
-                                // Safety Badge
-                                HStack(spacing: 3) {
-                                    Image(systemName: dir.safetyLevel.iconName)
-                                    Text(dir.safetyLevel.rawValue)
-                                }
-                                .font(.caption2)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(dir.safetyLevel.badgeColor.opacity(0.15))
-                                .foregroundColor(dir.safetyLevel.badgeColor)
-                                .cornerRadius(4)
-
-                                if dir.isClonedOrVirtual {
-                                    Text("APFS Clone")
+                                    Text(dir.category.localizedName)
                                         .font(.caption2)
                                         .padding(.horizontal, 6)
                                         .padding(.vertical, 2)
-                                        .background(Color.purple.opacity(0.15))
-                                        .foregroundColor(.purple)
+                                        .background(dir.category.color.opacity(0.15))
+                                        .foregroundColor(dir.category.color)
                                         .cornerRadius(4)
-                                        .help("File ini merupakan clone Copy-on-Write APFS yang membagikan blok fisik yang sama di disk")
+
+                                    // Safety Badge
+                                    HStack(spacing: 3) {
+                                        Image(systemName: dir.safetyLevel.iconName)
+                                        Text(dir.safetyLevel.rawValue)
+                                    }
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(dir.safetyLevel.badgeColor.opacity(0.15))
+                                    .foregroundColor(dir.safetyLevel.badgeColor)
+                                    .cornerRadius(4)
+
+                                    if dir.isClonedOrVirtual {
+                                        Text(loc("tag.apfsClone"))
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.purple.opacity(0.15))
+                                            .foregroundColor(.purple)
+                                            .cornerRadius(4)
+                                    }
                                 }
+
+                                Text(dir.url.path)
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
                             }
 
-                            Text(dir.url.path)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                                .truncationMode(.middle)
-                        }
+                            Spacer()
 
-                        Spacer()
+                            // Relative visual size bar
+                            let maxSize = currentItems.first?.size ?? 1
+                            let fraction = CGFloat(dir.size) / CGFloat(maxSize)
+                            GeometryReader { geo in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(dir.category.color.opacity(0.35))
+                                    .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                    .frame(maxHeight: .infinity, alignment: .center)
+                            }
+                            .frame(width: 80, height: 20)
 
-                        // Relative visual size bar
-                        let maxSize = currentItems.first?.size ?? 1
-                        let fraction = CGFloat(dir.size) / CGFloat(maxSize)
-                        GeometryReader { geo in
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(dir.category.color.opacity(0.35))
-                                .frame(width: max(4, geo.size.width * fraction), height: 8)
-                                .frame(maxHeight: .infinity, alignment: .center)
-                        }
-                        .frame(width: 80, height: 20)
+                            Text(dir.formattedSize)
+                                .font(.system(.body, design: .monospaced))
+                                .fontWeight(.semibold)
+                                .frame(width: 85, alignment: .trailing)
 
-                        Text(dir.formattedSize)
-                            .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .frame(width: 85, alignment: .trailing)
+                            // Drill down button if it has children
+                            if dir.hasChildren {
+                                Button {
+                                    navigationStack.append(dir)
+                                    loadFolder(dir)
+                                } label: {
+                                    Image(systemName: "chevron.right")
+                                }
+                                .buttonStyle(ModernRowActionStyle(tint: .blue))
+                                .help(loc("help.openSubfolder"))
+                            }
 
-                        // Drill down button if it has children
-                        if dir.hasChildren {
                             Button {
-                                navigationStack.append(dir)
-                                loadFolder(dir)
+                                viewModel.revealInFinder(url: dir.url)
                             } label: {
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.blue)
+                                Image(systemName: "folder.badge.gearshape")
                             }
-                            .help("Buka isi subfolder ini")
-                            .buttonStyle(.borderless)
-                        }
+                            .buttonStyle(ModernRowActionStyle(tint: .secondary))
+                            .help(loc("help.showInFinder"))
 
-                        Button {
-                            viewModel.revealInFinder(url: dir.url)
-                        } label: {
-                            Image(systemName: "folder.badge.gearshape")
-                        }
-                        .help("Tampilkan di Finder")
-                        .buttonStyle(.borderless)
-
-                        // Safety delete protection: System critical folders cannot be deleted!
-                        if dir.safetyLevel == .critical {
-                            Image(systemName: "lock.shield.fill")
-                                .foregroundColor(.secondary.opacity(0.7))
-                                .frame(width: 16)
-                                .help("Folder sistem ini dilindungi demi keamanan macOS dan tidak dapat dihapus.")
-                        } else {
-                            Button(role: .destructive) {
-                                folderToDelete = dir
-                                showDeleteAlert = true
-                            } label: {
-                                Image(systemName: "trash")
-                                    .foregroundColor(dir.safetyLevel == .caution ? .orange : .red.opacity(0.85))
+                            if dir.safetyLevel == .critical {
+                                Image(systemName: "lock.shield.fill")
+                                    .foregroundColor(.secondary.opacity(0.7))
+                                    .frame(width: 26, height: 26)
+                                    .help(loc("help.systemProtected"))
+                            } else {
+                                Button(role: .destructive) {
+                                    folderToDelete = dir
+                                    showDeleteAlert = true
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(ModernRowActionStyle(isDanger: true))
+                                .help(dir.safetyLevel == .caution ? loc("help.cautionFolder") : loc("help.moveToTrash"))
                             }
-                            .help(dir.safetyLevel == .caution ? "Hati-hati: Folder berisi data pengguna" : "Pindahkan ke Trash")
-                            .buttonStyle(.borderless)
                         }
                     }
-                    .padding(.vertical, 4)
+                    .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))
+                    .listRowSeparator(.hidden)
                 }
                 .listStyle(.inset)
             }
         }
         .confirmationDialog(
-            "Pindahkan ke Trash?",
+            loc("dialog.moveToTrash"),
             isPresented: $showDeleteAlert,
             titleVisibility: .visible,
             presenting: folderToDelete
         ) { folder in
-            Button("Pindahkan ke Trash (\(folder.formattedSize))", role: .destructive) {
+            Button("\(loc("dialog.moveToTrashBtn")) (\(folder.formattedSize))", role: .destructive) {
                 _ = viewModel.moveToTrash(url: folder.url)
                 if !navigationStack.isEmpty, let parent = navigationStack.last {
                     loadFolder(parent)
                 }
             }
-            Button("Batal", role: .cancel) {}
+            Button(loc("action.cancel"), role: .cancel) {}
         } message: { folder in
             if folder.safetyLevel == .caution {
-                Text("⚠️ PERHATIAN: '\(folder.name)' (\(folder.formattedSize)) berisi data aplikasi atau pengguna. Pastikan Anda tidak memerlukan file di dalamnya sebelum memindahkan ke Trash.")
+                Text(loc("dialog.cautionWarning"))
             } else {
-                Text("Folder '\(folder.name)' (\(folder.formattedSize)) akan dipindahkan ke Trash.")
+                Text(loc("dialog.folderWillBeTrashed"))
             }
         }
     }

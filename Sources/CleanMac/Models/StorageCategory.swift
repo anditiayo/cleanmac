@@ -11,6 +11,18 @@ public enum StorageCategory: String, CaseIterable, Identifiable, Sendable {
 
     public var id: String { rawValue }
 
+    public var localizedName: String {
+        switch self {
+        case .apps: return loc("cat.apps")
+        case .documents: return loc("cat.documents")
+        case .media: return loc("cat.media")
+        case .downloads: return loc("cat.downloads")
+        case .cache: return loc("cat.cache")
+        case .developer: return loc("cat.developer")
+        case .other: return loc("cat.other")
+        }
+    }
+
     public var iconName: String {
         switch self {
         case .apps: return "app.badge.fill"
@@ -68,4 +80,3 @@ public enum StorageCategory: String, CaseIterable, Identifiable, Sendable {
         return .other
     }
 }
-

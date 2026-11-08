@@ -17,10 +17,10 @@ public struct StorageChartView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Penggunaan Berdasarkan Kategori")
+                    Text(loc("dash.catBreakdown"))
                         .font(.headline)
                         .fontWeight(.bold)
-                    Text("Rincian alokasi penyimpanan Macintosh HD (gaya macOS Settings)")
+                    Text(loc("dash.catBreakdownSub"))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -28,7 +28,7 @@ public struct StorageChartView: View {
                 Spacer()
 
                 if !categories.isEmpty {
-                    Text("\(categories.count) Kategori Terdeteksi")
+                    Text("\(categories.count) \(loc("cat.detected"))")
                         .font(.caption2)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
@@ -42,16 +42,18 @@ public struct StorageChartView: View {
                     Image(systemName: "chart.bar.xaxis")
                         .font(.system(size: 32))
                         .foregroundColor(.secondary.opacity(0.4))
-                    Text("Klik 'Mulai Scan' untuk melihat rincian kategori.")
+                    Text(loc("dash.scanHint"))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 30)
             } else {
-                VStack(spacing: 8) {
-                    ForEach(categories) { item in
-                        categoryRow(for: item)
+                VStack(spacing: 6) {
+                    ForEach(Array(categories.enumerated()), id: \.element.id) { index, item in
+                        ModernListRowContainer(index: index) {
+                            categoryRow(for: item)
+                        }
                     }
                 }
             }
@@ -87,7 +89,7 @@ public struct StorageChartView: View {
                 // Category Name & Details
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
-                        Text(item.category.rawValue)
+                        Text(item.category.localizedName)
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.primary)
 
@@ -123,12 +125,6 @@ public struct StorageChartView: View {
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.secondary.opacity(0.6))
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(nsColor: .windowBackgroundColor).opacity(0.5))
-            )
         }
         .buttonStyle(.plain)
     }
