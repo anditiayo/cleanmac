@@ -3,10 +3,15 @@ import SwiftUI
 public struct MainContentView: View {
     @StateObject private var viewModel = DashboardViewModel()
     @AppStorage("appTheme") private var selectedThemeRaw: String = AppTheme.system.rawValue
+    @AppStorage("appLanguage") private var selectedLanguageRaw: String = AppLanguage.indonesian.rawValue
     @State private var showAboutSheet: Bool = false
 
     private var selectedTheme: AppTheme {
         AppTheme(rawValue: selectedThemeRaw) ?? .system
+    }
+
+    private var selectedLanguage: AppLanguage {
+        AppLanguage(rawValue: selectedLanguageRaw) ?? .indonesian
     }
 
     public init() {}
@@ -16,17 +21,31 @@ public struct MainContentView: View {
             VStack(spacing: 0) {
                 List(NavigationTab.allCases, selection: $viewModel.selectedTab) { tab in
                     NavigationLink(value: tab) {
-                        Label(tab.rawValue, systemImage: tab.iconName)
+                        Label(tab.localizedTitle(for: selectedLanguage), systemImage: tab.iconName)
                     }
                 }
                 .listStyle(.sidebar)
 
                 Divider()
 
-                // Theme Switcher & About Footer in Sidebar
+                // Settings Footer in Sidebar (Language & Theme)
                 VStack(spacing: 8) {
                     HStack(spacing: 8) {
-                        Text("Tema:")
+                        Text(selectedLanguage == .indonesian ? "Bahasa:" : "Language:")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+
+                        Picker("Bahasa", selection: $selectedLanguageRaw) {
+                            ForEach(AppLanguage.allCases) { lang in
+                                Text("\(lang.flag) \(lang.shortLabel)").tag(lang.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .controlSize(.small)
+                    }
+
+                    HStack(spacing: 8) {
+                        Text(selectedLanguage == .indonesian ? "Tema:" : "Theme:")
                             .font(.caption2)
                             .foregroundColor(.secondary)
 

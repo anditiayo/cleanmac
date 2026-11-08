@@ -32,30 +32,51 @@ public struct DashboardOverviewView: View {
 
                     Spacer()
 
-                    HStack(spacing: 8) {
+                    HStack(spacing: 10) {
                         Button {
                             viewModel.requestScan()
                         } label: {
-                            HStack(spacing: 6) {
+                            HStack(spacing: 8) {
                                 if viewModel.isScanning {
                                     ProgressView()
                                         .controlSize(.small)
+                                        .tint(.white)
                                 } else {
-                                    Image(systemName: "arrow.clockwise")
+                                    Image(systemName: "sparkle.magnifyingglass")
+                                        .font(.system(size: 16, weight: .bold))
                                 }
-                                Text(viewModel.isScanning ? "Scanning..." : "Mulai Scan")
+                                Text(viewModel.isScanning ? "SCANNING..." : "SCAN")
+                                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                                    .tracking(0.5)
                             }
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 22)
+                            .padding(.vertical, 9)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color(red: 0.16, green: 0.80, blue: 0.38), Color(red: 0.11, green: 0.65, blue: 0.30)],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                            )
+                            .shadow(color: Color.green.opacity(0.35), radius: 6, x: 0, y: 3)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.plain)
                         .disabled(viewModel.isScanning)
 
                         Button {
                             viewModel.showScanPermissionSheet = true
                         } label: {
-                            Image(systemName: "checklist")
-                                .font(.system(size: 13, weight: .semibold))
+                            Image(systemName: "slider.horizontal.3")
+                                .font(.system(size: 14, weight: .semibold))
+                                .frame(height: 22)
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.regular)

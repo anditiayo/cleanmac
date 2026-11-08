@@ -11,6 +11,15 @@ struct CleanMacApp: App {
         .windowStyle(.titleBar)
         .windowToolbarStyle(.unified)
         .commands {
+            CommandMenu("Bahasa / Language") {
+                Button("🇮🇩 Bahasa Indonesia (Default)") {
+                    UserDefaults.standard.set(AppLanguage.indonesian.rawValue, forKey: "appLanguage")
+                }
+                Button("🇬🇧 English") {
+                    UserDefaults.standard.set(AppLanguage.english.rawValue, forKey: "appLanguage")
+                }
+            }
+
             CommandGroup(replacing: .appInfo) {
                 Button("Tentang CleanMac") {
                     let alert = NSAlert()

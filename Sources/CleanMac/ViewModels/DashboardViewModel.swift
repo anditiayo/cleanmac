@@ -11,6 +11,17 @@ public enum NavigationTab: String, CaseIterable, Identifiable {
 
     public var id: String { rawValue }
 
+    public func localizedTitle(for language: AppLanguage) -> String {
+        switch self {
+        case .dashboard: return "Dashboard"
+        case .allFolders: return language == .indonesian ? "Semua Folder" : "All Folders"
+        case .junkCleaner: return language == .indonesian ? "Pembersih Sampah" : "Junk Cleaner"
+        case .apps: return language == .indonesian ? "Aplikasi" : "Applications"
+        case .files: return language == .indonesian ? "File Besar" : "Large Files"
+        case .caches: return "Cache & Logs"
+        }
+    }
+
     public var iconName: String {
         switch self {
         case .dashboard: return "gauge.medium"

@@ -220,3 +220,4 @@ public struct ScanPermissionSheet: View {
         .buttonStyle(.plain)
     }
 }
+

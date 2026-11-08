@@ -25,3 +25,4 @@ public struct ScanPermissions: Codable, Equatable {
         scanApplications || scanLargeFiles || scanCaches || scanJunk || scanDeepDirectories
     }
 }
+

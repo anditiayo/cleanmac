@@ -123,7 +123,29 @@ public struct CacheListView: View {
                     .padding(.vertical, 6)
                     .background(Color(nsColor: .controlBackgroundColor).opacity(0.8))
                     .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                    )
                 }
+
+                // Row 3: Guide Legend Bar
+                HStack(spacing: 14) {
+                    Text("Panduan Cache:")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.green)
+                        Text("Aman Dihapus (Akan dibuat ulang otomatis oleh aplikasi saat diperlukan)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)

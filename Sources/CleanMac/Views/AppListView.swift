@@ -133,7 +133,38 @@ public struct AppListView: View {
                     .padding(.vertical, 6)
                     .background(Color(nsColor: .controlBackgroundColor).opacity(0.8))
                     .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                    )
                 }
+
+                // Row 3: Guide Legend Bar
+                HStack(spacing: 14) {
+                    Text("Fitur Uninstaller:")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "trash.circle.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.red)
+                        Text("Copot Bersih Termasuk Berkas Sisa di ~/Library")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 11))
+                            .foregroundColor(.blue)
+                        Text("Deteksi Otomatis Ukuran & Bundle ID")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)

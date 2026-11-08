@@ -76,12 +76,28 @@ public struct JunkCleanerView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+
+                            Button(role: .destructive) {
+                                showDeleteSelectedAlert = true
+                            } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: "trash.fill")
+                                    Text("Hapus Yang Dipilih")
+                                        .fontWeight(.semibold)
+                                }
+                                .font(.subheadline)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+                            .disabled(viewModel.selectedCleanableIDs.isEmpty)
                         }
                     }
                 }
 
-                // Row 2: Title & Metrics / Action
-                HStack(alignment: .center) {
+                // Row 2: Title & Metrics
+                HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Pembersih File Aman Dihapus")
                             .font(.title2)
@@ -95,41 +111,54 @@ public struct JunkCleanerView: View {
 
                     Spacer()
 
-                    if !viewModel.cleanableItems.isEmpty {
-                        HStack(spacing: 12) {
-                            // Summary badge
-                            VStack(alignment: .trailing, spacing: 1) {
-                                Text(ByteFormatter.string(from: viewModel.selectedCleanableSize))
-                                    .font(.system(.title3, design: .monospaced))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                Text("\(viewModel.selectedCleanableIDs.count) dari \(viewModel.cleanableItems.count) item dipilih")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color(nsColor: .controlBackgroundColor).opacity(0.8))
-                            .cornerRadius(8)
-
-                            // Action button
-                            Button(role: .destructive) {
-                                showDeleteSelectedAlert = true
-                            } label: {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "trash.fill")
-                                    Text("Hapus Yang Dipilih")
-                                        .fontWeight(.semibold)
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 7)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.red)
-                            .disabled(viewModel.selectedCleanableIDs.isEmpty)
+                    // Metrics badge (Matching DirectorySizesView)
+                    HStack(spacing: 12) {
+                        VStack(alignment: .trailing, spacing: 1) {
+                            Text(ByteFormatter.string(from: viewModel.selectedCleanableSize))
+                                .font(.system(.title3, design: .monospaced))
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+                            Text("\(viewModel.selectedCleanableIDs.count) dari \(viewModel.cleanableItems.count) item dipilih")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
                         }
                     }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color(nsColor: .controlBackgroundColor).opacity(0.8))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                    )
                 }
+
+                // Row 3: Safety Guide Legend Bar
+                HStack(spacing: 14) {
+                    Text("Panduan Keamanan:")
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.system(size: 11))
+                            .foregroundColor(.green)
+                        Text("Aman Dihapus (Dipindahkan ke Trash)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 11))
+                            .foregroundColor(.blue)
+                        Text("Potensi Hemat: \(ByteFormatter.string(from: viewModel.totalCleanableSize))")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
