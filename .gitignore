@@ -5,4 +5,5 @@ Packages/
 *.xcodeproj
 *.xcworkspace
 .swiftpm/
+*.dmg
 

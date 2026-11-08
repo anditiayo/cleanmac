@@ -4,11 +4,13 @@ public final class FileScanner: Sendable {
     public init() {}
 
     public func scanLargeFiles(
-        minSizeBytes: Int64 = 50 * 1024 * 1024, // default 50 MB
+        minSizeBytes: Int64 = 10 * 1024 * 1024, // 10 MB
         maxResults: Int = 100,
         onProgress: (@Sendable (String) -> Void)? = nil
     ) async -> [FileInfo] {
         let home = FileManager.default.homeDirectoryForCurrentUser
+
+        // Target user-facing folders where large files actually belong
         let targetDirs: [URL] = [
             home.appendingPathComponent("Downloads", isDirectory: true),
             home.appendingPathComponent("Documents", isDirectory: true),
@@ -16,13 +18,6 @@ public final class FileScanner: Sendable {
             home.appendingPathComponent("Movies", isDirectory: true),
             home.appendingPathComponent("Music", isDirectory: true),
             home.appendingPathComponent("Pictures", isDirectory: true),
-            // Also scan Library directories for big data consumers
-            home.appendingPathComponent("Library/Application Support", isDirectory: true),
-            home.appendingPathComponent("Library/Containers", isDirectory: true),
-            home.appendingPathComponent("Library/Group Containers", isDirectory: true),
-            home.appendingPathComponent("Library/Developer", isDirectory: true),
-            home.appendingPathComponent("Library/Caches", isDirectory: true),
-            home.appendingPathComponent("Library/Mail", isDirectory: true),
         ]
 
         var largeFiles: [FileInfo] = []
@@ -59,12 +54,13 @@ public final class FileScanner: Sendable {
                 let isDirectory = values.isDirectory ?? false
                 let isPackage = values.isPackage ?? false
 
-                // If it's a directory that isn't a package, check for special folders
+                // If it's a directory (and not an app/package), only match known bulky dev folders
                 if isDirectory && !isPackage {
                     let folderName = fileURL.lastPathComponent
-                    let bulkyFolders = ["node_modules", "DerivedData", ".build", "Pods", ".gradle",
-                                        "build", "target", "dist", "__pycache__", ".tox", "venv",
-                                        ".venv", "vendor"]
+                    let bulkyFolders = [
+                        "node_modules", "DerivedData", ".build", "Pods", ".gradle",
+                        "build", "target", "dist", "venv", ".venv", "vendor"
+                    ]
                     if bulkyFolders.contains(folderName) {
                         enumerator.skipDescendants()
                         let size = FolderSizeCalculator.size(of: fileURL)
@@ -79,24 +75,10 @@ public final class FileScanner: Sendable {
                             ))
                         }
                     }
-                    // Also treat large app-data directories (>100MB) as notable items
-                    else if fileURL.path.contains("/Library/") {
-                        let size = FolderSizeCalculator.size(of: fileURL)
-                        if size >= minSizeBytes * 5 { // 50 MB threshold for Library subdirs
-                            enumerator.skipDescendants()
-                            largeFiles.append(FileInfo(
-                                name: folderName,
-                                url: fileURL,
-                                size: size,
-                                isDirectory: true,
-                                modificationDate: values.contentModificationDate,
-                                category: StorageCategory.category(for: fileURL)
-                            ))
-                        }
-                    }
                     continue
                 }
 
+                // Normal file: check size
                 let size = Int64(values.totalFileAllocatedSize ?? values.fileSize ?? 0)
                 if size >= minSizeBytes {
                     let category = StorageCategory.category(for: fileURL)
@@ -108,6 +90,31 @@ public final class FileScanner: Sendable {
                         modificationDate: values.contentModificationDate,
                         category: category
                     ))
+                }
+            }
+        }
+
+        // Also check standalone large files sitting directly in home folder
+        if let homeContents = try? FileManager.default.contentsOfDirectory(
+            at: home,
+            includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey],
+            options: [.skipsHiddenFiles]
+        ) {
+            for item in homeContents {
+                var isDir: ObjCBool = false
+                FileManager.default.fileExists(atPath: item.path, isDirectory: &isDir)
+                if !isDir.boolValue {
+                    let size = FolderSizeCalculator.size(of: item)
+                    if size >= minSizeBytes {
+                        largeFiles.append(FileInfo(
+                            name: item.lastPathComponent,
+                            url: item,
+                            size: size,
+                            isDirectory: false,
+                            modificationDate: (try? item.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate,
+                            category: StorageCategory.category(for: item)
+                        ))
+                    }
                 }
             }
         }
