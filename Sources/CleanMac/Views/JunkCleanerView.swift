@@ -39,58 +39,72 @@ public struct JunkCleanerView: View {
 
                     if !viewModel.cleanableItems.isEmpty {
                         HStack(spacing: 8) {
-                            Button {
-                                viewModel.selectAllCleanables()
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "checkmark.circle")
-                                    Text("Pilih Semua")
+                            // Integrated Segmented Selection Pill
+                            HStack(spacing: 0) {
+                                Button {
+                                    viewModel.selectAllCleanables()
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(.blue)
+                                        Text("Semua")
+                                            .font(.subheadline)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
                                 }
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 5)
-                                .background(Color(nsColor: .controlBackgroundColor))
-                                .cornerRadius(6)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                                )
-                            }
-                            .buttonStyle(.plain)
+                                .buttonStyle(.plain)
 
-                            Button {
-                                viewModel.deselectAllCleanables()
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "xmark.circle")
-                                    Text("Batal Pilih")
+                                Divider()
+                                    .frame(height: 14)
+
+                                Button {
+                                    viewModel.deselectAllCleanables()
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "xmark.circle")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(.secondary)
+                                        Text("Batal")
+                                            .font(.subheadline)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
                                 }
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 5)
-                                .background(Color(nsColor: .controlBackgroundColor))
-                                .cornerRadius(6)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
-                                )
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color(nsColor: .separatorColor), lineWidth: 0.5)
+                            )
 
+                            // Pro Red Delete Button
                             Button(role: .destructive) {
                                 showDeleteSelectedAlert = true
                             } label: {
-                                HStack(spacing: 5) {
+                                HStack(spacing: 6) {
                                     Image(systemName: "trash.fill")
+                                        .font(.system(size: 12, weight: .semibold))
                                     Text("Hapus Yang Dipilih")
-                                        .fontWeight(.semibold)
+                                        .font(.system(size: 13, weight: .semibold))
                                 }
-                                .font(.subheadline)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(
+                                            viewModel.selectedCleanableIDs.isEmpty
+                                            ? Color.gray.opacity(0.4)
+                                            : Color(red: 0.88, green: 0.22, blue: 0.22)
+                                        )
+                                )
+                                .shadow(color: viewModel.selectedCleanableIDs.isEmpty ? .clear : Color.red.opacity(0.25), radius: 4, x: 0, y: 2)
                             }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.red)
+                            .buttonStyle(.plain)
                             .disabled(viewModel.selectedCleanableIDs.isEmpty)
                         }
                     }
@@ -273,9 +287,21 @@ public struct JunkCleanerView: View {
 
             Spacer()
 
+            // Relative visual size bar (matching DirectorySizesView)
+            let maxSize = viewModel.cleanableItems.first?.size ?? 1
+            let fraction = CGFloat(item.size) / CGFloat(max(1, maxSize))
+            GeometryReader { geo in
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.red.opacity(0.35))
+                    .frame(width: max(4, geo.size.width * fraction), height: 8)
+                    .frame(maxHeight: .infinity, alignment: .center)
+            }
+            .frame(width: 80, height: 20)
+
             Text(item.formattedSize)
                 .font(.system(.body, design: .monospaced))
                 .fontWeight(.semibold)
+                .frame(width: 85, alignment: .trailing)
 
             Button {
                 viewModel.revealInFinder(url: item.url)

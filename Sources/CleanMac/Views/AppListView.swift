@@ -190,9 +190,28 @@ public struct AppListView: View {
                             .frame(width: 40, height: 40)
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(app.name)
-                                .font(.body)
-                                .fontWeight(.medium)
+                            HStack(spacing: 6) {
+                                Text(app.name)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+
+                                Text("Aplikasi")
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.blue.opacity(0.15))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(4)
+
+                                Text("Uninstaller")
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.purple.opacity(0.15))
+                                    .foregroundColor(.purple)
+                                    .cornerRadius(4)
+                            }
+
                             Text(app.url.path)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
@@ -202,9 +221,21 @@ public struct AppListView: View {
 
                         Spacer()
 
+                        // Relative visual size bar (matching DirectorySizesView)
+                        let maxSize = filteredApps.first?.size ?? 1
+                        let fraction = CGFloat(app.size) / CGFloat(maxSize)
+                        GeometryReader { geo in
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(Color.blue.opacity(0.35))
+                                .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                .frame(maxHeight: .infinity, alignment: .center)
+                        }
+                        .frame(width: 80, height: 20)
+
                         Text(app.formattedSize)
                             .font(.system(.body, design: .monospaced))
                             .fontWeight(.semibold)
+                            .frame(width: 85, alignment: .trailing)
 
                         Button {
                             viewModel.revealInFinder(url: app.url)

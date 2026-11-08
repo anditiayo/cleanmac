@@ -27,3 +27,4 @@ public enum AppLanguage: String, CaseIterable, Identifiable {
         }
     }
 }
+

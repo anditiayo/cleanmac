@@ -80,15 +80,31 @@ public struct CacheListView: View {
                             viewModel.cleanAllCaches()
                         } label: {
                             HStack(spacing: 6) {
-                                Image(systemName: "trash.circle.fill")
+                                Image(systemName: "trash.fill")
+                                    .font(.system(size: 11, weight: .semibold))
                                 Text("Bersihkan Semua Cache")
-                                    .fontWeight(.semibold)
+                                    .font(.system(size: 12, weight: .semibold))
                             }
-                            .padding(.horizontal, 10)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
                             .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color(red: 0.92, green: 0.28, blue: 0.28), Color(red: 0.80, green: 0.18, blue: 0.18)],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
+                            )
+                            .shadow(color: Color.red.opacity(0.3), radius: 4, x: 0, y: 2)
                         }
-                        .buttonStyle(.bordered)
-                        .tint(.red)
+                        .buttonStyle(.plain)
                     }
                 }
 
@@ -171,9 +187,28 @@ public struct CacheListView: View {
                             .frame(width: 36, height: 36)
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(item.name)
-                                .font(.body)
-                                .fontWeight(.medium)
+                            HStack(spacing: 6) {
+                                Text(item.name)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+
+                                Text("Cache")
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.15))
+                                    .foregroundColor(.orange)
+                                    .cornerRadius(4)
+
+                                Text("Aman Dihapus")
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.green.opacity(0.15))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(4)
+                            }
+
                             Text(item.url.path)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
@@ -183,9 +218,21 @@ public struct CacheListView: View {
 
                         Spacer()
 
+                        // Relative visual size bar (matching DirectorySizesView)
+                        let maxSize = filteredCaches.first?.size ?? 1
+                        let fraction = CGFloat(item.size) / CGFloat(maxSize)
+                        GeometryReader { geo in
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(Color.orange.opacity(0.35))
+                                .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                .frame(maxHeight: .infinity, alignment: .center)
+                        }
+                        .frame(width: 80, height: 20)
+
                         Text(item.formattedSize)
                             .font(.system(.body, design: .monospaced))
                             .fontWeight(.semibold)
+                            .frame(width: 85, alignment: .trailing)
 
                         Button {
                             viewModel.revealInFinder(url: item.url)
@@ -199,7 +246,7 @@ public struct CacheListView: View {
                             _ = viewModel.moveToTrash(url: item.url)
                         } label: {
                             Image(systemName: "trash")
-                                .foregroundColor(.red.opacity(0.8))
+                                .foregroundColor(.red.opacity(0.85))
                         }
                         .help("Pindahkan ke Trash")
                         .buttonStyle(.borderless)

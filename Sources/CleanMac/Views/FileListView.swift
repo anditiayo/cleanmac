@@ -255,9 +255,21 @@ public struct FileListView: View {
 
                         Spacer()
 
+                        // Relative visual size bar (matching DirectorySizesView)
+                        let maxSize = filteredFiles.first?.size ?? 1
+                        let fraction = CGFloat(file.size) / CGFloat(maxSize)
+                        GeometryReader { geo in
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(file.category.color.opacity(0.35))
+                                .frame(width: max(4, geo.size.width * fraction), height: 8)
+                                .frame(maxHeight: .infinity, alignment: .center)
+                        }
+                        .frame(width: 80, height: 20)
+
                         Text(file.formattedSize)
                             .font(.system(.body, design: .monospaced))
                             .fontWeight(.semibold)
+                            .frame(width: 85, alignment: .trailing)
 
                         Button {
                             selectedFileForPreview = file
@@ -281,7 +293,7 @@ public struct FileListView: View {
                             showTrashConfirm = true
                         } label: {
                             Image(systemName: "trash")
-                                .foregroundColor(.red.opacity(0.8))
+                                .foregroundColor(.red.opacity(0.85))
                         }
                         .help("Pindahkan ke Trash")
                         .buttonStyle(.borderless)

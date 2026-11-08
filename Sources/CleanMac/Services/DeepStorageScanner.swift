@@ -162,14 +162,10 @@ public final class DeepStorageScanner: Sendable {
             ("Music", "Music", .media),
             ("Pictures", "Pictures", .media),
 
-            // Library primary components (independent, non-overlapping)
+            // Library primary safe components (no app sandbox TCC prompts!)
             ("Library/Application Support", "App Support Data", .other),
             ("Library/Caches", "Caches", .cache),
-            ("Library/Containers", "App Containers (Sandboxed Apps)", .other),
-            ("Library/Group Containers", "Group Containers (WhatsApp/Office)", .other),
             ("Library/Developer", "Developer Tools Data (Xcode)", .developer),
-            ("Library/Mail", "Mail Data", .other),
-            ("Library/Messages", "iMessage Data", .other),
             ("Library/Logs", "System Logs", .cache),
 
             // Hidden developer caches in Home
