@@ -25,13 +25,13 @@ public enum StorageCategory: String, CaseIterable, Identifiable, Sendable {
 
     public var color: Color {
         switch self {
-        case .apps: return .blue
-        case .documents: return .green
-        case .media: return .orange
+        case .documents: return .red
+        case .apps: return .orange
+        case .developer: return .yellow
+        case .media: return .green
         case .downloads: return .purple
-        case .cache: return .red
-        case .developer: return .cyan
-        case .other: return .gray
+        case .cache: return .cyan
+        case .other: return Color(nsColor: .systemGray)
         }
     }
 

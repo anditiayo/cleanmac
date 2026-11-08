@@ -51,15 +51,15 @@ public struct DashboardOverviewView: View {
                     .disabled(viewModel.isScanning)
                 }
 
-                // 1. Storage Bar
-                StorageBarView(diskInfo: viewModel.diskInfo)
+                // 1. Storage Bar (Divided by category colors like macOS Settings)
+                StorageBarView(diskInfo: viewModel.diskInfo, categories: viewModel.categoryUsages)
 
                 // 2. Quick Stat Cards - Row 1
                 HStack(spacing: 12) {
                     StatCard(
-                        title: "Total Terdeteksi",
+                        title: "Semua Folder",
                         value: ByteFormatter.string(from: viewModel.totalDirectorySizesScanned),
-                        subtitle: "\(viewModel.directorySizes.count) folder dipindai",
+                        subtitle: "\(viewModel.directorySizes.count) folder dianalisis",
                         icon: "folder.badge.questionmark",
                         color: .cyan
                     ) {
