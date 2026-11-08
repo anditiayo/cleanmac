@@ -1,9 +1,20 @@
 import SwiftUI
 
 public enum FolderSafetyLevel: String, Sendable {
-    case critical = "Sistem (Jangan Hapus)"
-    case caution = "Hati-hati"
-    case safe = "Aman Dihapus"
+    case critical = "critical"
+    case caution = "caution"
+    case safe = "safe"
+
+    public var localizedName: String {
+        switch self {
+        case .critical:
+            return loc("safety.critical")
+        case .caution:
+            return loc("safety.caution")
+        case .safe:
+            return loc("safety.safe")
+        }
+    }
 
     public var badgeColor: Color {
         switch self {
@@ -42,4 +53,3 @@ public enum FolderSafetyLevel: String, Sendable {
         return .caution
     }
 }
-

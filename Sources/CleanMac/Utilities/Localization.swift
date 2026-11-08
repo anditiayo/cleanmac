@@ -17,6 +17,20 @@ public final class LocalizationManager: ObservableObject {
         let isId = (language == .indonesian)
         switch key {
 
+        // ── Cleanable Types ──
+        case "clean.appCache": return isId ? "Cache Aplikasi" : "Application Caches"
+        case "clean.systemLogs": return isId ? "File Log & Diagnostik" : "System & Diagnostic Logs"
+        case "clean.xcode": return isId ? "Xcode DerivedData (Build Cache)" : "Xcode DerivedData (Build Cache)"
+        case "clean.installers": return isId ? "Installer Bekas (.dmg / .pkg)" : "Old Installers (.dmg / .pkg)"
+        case "clean.trash": return isId ? "Tempat Sampah (Trash)" : "Trash"
+        case "clean.devCache": return isId ? "Cache Package Manager (npm/cargo)" : "Package Manager Caches (npm/cargo)"
+        case "clean.safetyRecreated": return isId ? "Sangat Aman (dibuat ulang otomatis jika dibutuhkan)" : "Very Safe (automatically recreated when needed)"
+        case "clean.safetyLogs": return isId ? "Sangat Aman (hanya catatan log teks)" : "Very Safe (plain text system logs)"
+        case "clean.safetyXcode": return isId ? "Aman (hanya cache build, Xcode akan compile ulang)" : "Safe (build cache, Xcode recompiles)"
+        case "clean.safetyInstallers": return isId ? "Aman jika aplikasi sudah terinstall" : "Safe if apps are already installed"
+        case "clean.safetyTrash": return isId ? "Aman (file yang sudah dibuang ke Trash)" : "Safe (files already in Trash)"
+        case "clean.safetyDevCache": return isId ? "Aman (cache dapat diunduh ulang)" : "Safe (packages can be re-downloaded)"
+
         // ── Navigation ──
         case "nav.dashboard": return "Dashboard"
         case "nav.allFolders": return isId ? "Semua Folder" : "All Folders"
@@ -60,6 +74,9 @@ public final class LocalizationManager: ObservableObject {
         case "header.cachesSub": return isId ? "Berkas cache aplikasi dan log diagnostik di folder ~/Library/Caches" : "Application caches and diagnostic logs in ~/Library/Caches"
 
         // ── Safety & Guides ──
+        case "safety.critical": return isId ? "Sistem (Proteksi)" : "System (Protected)"
+        case "safety.caution": return isId ? "Hati-hati" : "Caution"
+        case "safety.safe": return isId ? "Aman Dihapus" : "Safe to Delete"
         case "guide.safetyTitle": return isId ? "Panduan Keamanan:" : "Safety Guide:"
         case "guide.safe": return isId ? "Aman Dihapus" : "Safe to Delete"
         case "guide.caution": return isId ? "Hati-hati (Data Pengguna)" : "Caution (User Data)"

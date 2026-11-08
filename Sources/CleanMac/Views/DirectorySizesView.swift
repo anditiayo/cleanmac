@@ -297,7 +297,7 @@ public struct DirectorySizesView: View {
                                     // Safety Badge
                                     HStack(spacing: 3) {
                                         Image(systemName: dir.safetyLevel.iconName)
-                                        Text(dir.safetyLevel.rawValue)
+                                        Text(dir.safetyLevel.localizedName)
                                     }
                                     .font(.caption2)
                                     .padding(.horizontal, 6)

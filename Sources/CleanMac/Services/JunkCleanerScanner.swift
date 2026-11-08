@@ -10,6 +10,17 @@ public enum CleanableType: String, CaseIterable, Identifiable, Sendable {
 
     public var id: String { rawValue }
 
+    public var localizedTitle: String {
+        switch self {
+        case .appCache: return loc("clean.appCache")
+        case .systemLogs: return loc("clean.systemLogs")
+        case .xcodeDerivedData: return loc("clean.xcode")
+        case .oldInstallers: return loc("clean.installers")
+        case .trash: return loc("clean.trash")
+        case .developerCache: return loc("clean.devCache")
+        }
+    }
+
     public var iconName: String {
         switch self {
         case .appCache: return "archivebox.fill"
@@ -21,15 +32,19 @@ public enum CleanableType: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    public var safetyLevel: String {
+    public var localizedSafetyLevel: String {
         switch self {
-        case .appCache: return "Sangat Aman (dibuat ulang otomatis jika dibutuhkan)"
-        case .systemLogs: return "Sangat Aman (hanya catatan log teks)"
-        case .xcodeDerivedData: return "Aman (hanya cache build, Xcode akan compile ulang)"
-        case .oldInstallers: return "Aman jika aplikasi sudah terinstall"
-        case .trash: return "Aman (file yang sudah dibuang ke Trash)"
-        case .developerCache: return "Aman (cache npm/yarn/cargo dapat diunduh ulang)"
+        case .appCache: return loc("clean.safetyRecreated")
+        case .systemLogs: return loc("clean.safetyLogs")
+        case .xcodeDerivedData: return loc("clean.safetyXcode")
+        case .oldInstallers: return loc("clean.safetyInstallers")
+        case .trash: return loc("clean.safetyTrash")
+        case .developerCache: return loc("clean.safetyDevCache")
         }
+    }
+
+    public var safetyLevel: String {
+        localizedSafetyLevel
     }
 }
 

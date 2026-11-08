@@ -193,10 +193,10 @@ public struct JunkCleanerView: View {
                                 HStack(spacing: 8) {
                                     Image(systemName: type.iconName)
                                         .foregroundColor(.orange)
-                                    Text(type.rawValue)
+                                    Text(type.localizedTitle)
                                         .font(.headline)
                                     Spacer()
-                                    Text(type.safetyLevel)
+                                    Text(type.localizedSafetyLevel)
                                         .font(.caption2)
                                         .padding(.horizontal, 6)
                                         .padding(.vertical, 2)
