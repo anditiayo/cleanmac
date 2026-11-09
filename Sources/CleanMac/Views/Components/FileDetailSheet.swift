@@ -14,6 +14,24 @@ public struct FileDetailSheet: View {
         self.onReveal = onReveal
     }
 
+    private var isProtectedFolder: Bool {
+        if file.isProtected { return true }
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let protectedPaths: Set<String> = [
+            "\(home)/Documents",
+            "\(home)/Downloads",
+            "\(home)/Desktop",
+            "\(home)/Movies",
+            "\(home)/Music",
+            "\(home)/Pictures",
+            "\(home)/Library",
+            "\(home)/Developer",
+            "/System",
+            "/Applications"
+        ]
+        return protectedPaths.contains(file.url.path) || file.url.path.hasPrefix("/System/")
+    }
+
     public var body: some View {
         VStack(spacing: 20) {
             // Header with icon
@@ -30,13 +48,28 @@ public struct FileDetailSheet: View {
                         .lineLimit(1)
 
                     HStack(spacing: 6) {
-                        Text(file.category.localizedName)
-                            .font(.caption2)
+                        if isProtectedFolder {
+                            HStack(spacing: 3) {
+                                Image(systemName: "lock.shield.fill")
+                                    .font(.system(size: 9))
+                                Text(loc("safety.protectedNoDelete"))
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                            }
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(file.category.color.opacity(0.15))
-                            .foregroundColor(file.category.color)
+                            .background(Color.orange.opacity(0.15))
+                            .foregroundColor(.orange)
                             .cornerRadius(4)
+                        } else {
+                            Text(file.category.localizedName)
+                                .font(.caption2)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(file.category.color.opacity(0.15))
+                                .foregroundColor(file.category.color)
+                                .cornerRadius(4)
+                        }
 
                         Text(file.isDirectory ? loc("tag.directory") : loc("tag.file"))
                             .font(.caption)
@@ -89,9 +122,9 @@ public struct FileDetailSheet: View {
                     NSWorkspace.shared.open(file.url)
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: "arrow.up.right.square")
+                        Image(systemName: file.isDirectory ? "folder" : "arrow.up.right.square")
                             .font(.system(size: 13, weight: .semibold))
-                        Text(loc("action.openFile"))
+                        Text(file.isDirectory ? loc("action.openFolder") : loc("action.openFile"))
                     }
                 }
                 .buttonStyle(ModernSecondaryButtonStyle(accentColor: .blue))
@@ -100,7 +133,7 @@ public struct FileDetailSheet: View {
                     onReveal()
                 } label: {
                     HStack(spacing: 6) {
-                        Image(systemName: "folder")
+                        Image(systemName: "folder.badge.gearshape")
                             .font(.system(size: 13, weight: .semibold))
                         Text(loc("action.showInFinder"))
                     }
@@ -109,17 +142,37 @@ public struct FileDetailSheet: View {
 
                 Spacer()
 
-                Button(role: .destructive) {
-                    dismiss()
-                    onTrash()
-                } label: {
+                if isProtectedFolder {
                     HStack(spacing: 6) {
-                        Image(systemName: "trash.fill")
+                        Image(systemName: "lock.shield.fill")
                             .font(.system(size: 13, weight: .semibold))
-                        Text(loc("action.moveToTrash"))
+                            .foregroundColor(.orange)
+                        Text(loc("safety.protectedNoDelete"))
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.orange)
                     }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Color.orange.opacity(0.12))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                    )
+                    .help(loc("help.systemProtected"))
+                } else {
+                    Button(role: .destructive) {
+                        dismiss()
+                        onTrash()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "trash.fill")
+                                .font(.system(size: 13, weight: .semibold))
+                            Text(loc("action.moveToTrash"))
+                        }
+                    }
+                    .buttonStyle(ModernPrimaryButtonStyle(isDestructive: true))
                 }
-                .buttonStyle(ModernPrimaryButtonStyle(isDestructive: true))
             }
         }
         .padding(24)

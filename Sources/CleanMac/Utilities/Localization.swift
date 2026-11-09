@@ -86,6 +86,7 @@ public final class LocalizationManager: ObservableObject {
         case "action.moveToTrash": return isId ? "Pindahkan ke Trash" : "Move to Trash"
         case "action.deleteNow": return isId ? "Hapus Sekarang" : "Delete Now"
         case "action.openFile": return isId ? "Buka Berkas" : "Open File"
+        case "action.openFolder": return isId ? "Buka Folder" : "Open Folder"
         case "action.showInFinder": return isId ? "Tampilkan di Finder" : "Show in Finder"
 
         // ── Headers ──
@@ -102,6 +103,7 @@ public final class LocalizationManager: ObservableObject {
 
         // ── Safety & Guides ──
         case "safety.critical": return isId ? "Sistem (Proteksi)" : "System (Protected)"
+        case "safety.protectedNoDelete": return isId ? "Folder Dilindungi (Tidak Dapat Dihapus)" : "Protected (Cannot be Deleted)"
         case "safety.caution": return isId ? "Hati-hati" : "Caution"
         case "safety.safe": return isId ? "Aman Dihapus" : "Safe to Delete"
         case "guide.safetyTitle": return isId ? "Panduan Keamanan:" : "Safety Guide:"
