@@ -95,8 +95,8 @@ public final class LocalizationManager: ObservableObject {
         case "header.junkCleanerSub": return isId ? "Cache build, temporary log, package manager cache, dan installer sisa" : "Build cache, temporary logs, package manager cache, and residual installers"
         case "header.apps": return isId ? "Aplikasi Terinstal" : "Installed Applications"
         case "header.appsSub": return isId ? "Kelola aplikasi terpasang & copot sisa berkas secara tuntas (Uninstaller)" : "Manage installed apps & completely remove leftovers (Uninstaller)"
-        case "header.files": return isId ? "File & Folder Besar" : "Large Files & Folders"
-        case "header.filesSub": return isId ? "Berkas pengguna (>10 MB) di Downloads, Dokumen, Desktop, Movies & Pictures" : "User files (>10 MB) in Downloads, Documents, Desktop, Movies & Pictures"
+        case "header.files": return isId ? "Dokumen & Berkas Besar" : "Documents & Large Files"
+        case "header.filesSub": return isId ? "Semua berkas dokumen, folder proyek, unduhan, dan file besar pengguna" : "User documents, project folders, downloads, and large files"
         case "header.caches": return isId ? "Cache & File Sementara" : "Cache & Temporary Files"
         case "header.cachesSub": return isId ? "Berkas cache aplikasi dan log diagnostik di folder ~/Library/Caches" : "Application caches and diagnostic logs in ~/Library/Caches"
 
@@ -223,6 +223,7 @@ public final class LocalizationManager: ObservableObject {
         // ── Scan Settings Help ──
         case "help.scanSettings": return isId ? "Atur Izin & Opsi Pemindaian..." : "Scan Permissions & Options..."
         case "help.showInFinder": return isId ? "Tampilkan di Finder" : "Show in Finder"
+        case "help.systemAppProtected": return isId ? "Aplikasi sistem bawaan macOS ini dilindungi demi keamanan dan tidak dapat dihapus." : "This built-in macOS system application is protected for security and cannot be deleted."
         case "help.uninstallClean": return isId ? "Uninstall Tuntas (Hapus Aplikasi & Semua Data Terkait)" : "Complete Uninstall (Remove App & All Related Data)"
         case "help.openSubfolder": return isId ? "Buka isi subfolder ini" : "Open this subfolder"
         case "help.systemProtected": return isId ? "Folder sistem ini dilindungi demi keamanan macOS dan tidak dapat dihapus." : "This system folder is protected for macOS security and cannot be deleted."
@@ -269,6 +270,8 @@ public final class LocalizationManager: ObservableObject {
         // ── Tags ──
         case "tag.app": return isId ? "Aplikasi" : "App"
         case "tag.uninstaller": return "Uninstaller"
+        case "tag.systemProtected": return isId ? "Proteksi Sistem" : "System Protected"
+        case "tag.documentFolder": return isId ? "Folder Dokumen" : "Document Folder"
         case "tag.cache": return "Cache"
         case "tag.safeToDelete": return isId ? "Aman Dihapus" : "Safe to Delete"
         case "tag.apfsClone": return "APFS Clone"

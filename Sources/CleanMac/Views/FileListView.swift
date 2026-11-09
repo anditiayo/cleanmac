@@ -211,13 +211,24 @@ public struct FileListView: View {
                                         .font(.body)
                                         .fontWeight(.medium)
 
-                                    Text(file.category.localizedName)
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(file.category.color.opacity(0.15))
-                                        .foregroundColor(file.category.color)
-                                        .cornerRadius(4)
+                                    if let customTag = file.customTag {
+                                        Text(customTag)
+                                            .font(.caption2)
+                                            .fontWeight(.medium)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.blue.opacity(0.15))
+                                            .foregroundColor(.blue)
+                                            .cornerRadius(4)
+                                    } else {
+                                        Text(file.category.localizedName)
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(file.category.color.opacity(0.15))
+                                            .foregroundColor(file.category.color)
+                                            .cornerRadius(4)
+                                    }
                                 }
 
                                 Text(file.url.path)
@@ -260,14 +271,22 @@ public struct FileListView: View {
                             .buttonStyle(ModernRowActionStyle(tint: .secondary))
                             .help(loc("help.showInFinder"))
 
-                            Button(role: .destructive) {
-                                itemToTrash = file
-                                showTrashConfirm = true
-                            } label: {
-                                Image(systemName: "trash")
+                            if file.isProtected {
+                                Image(systemName: "shield.lefthalf.filled")
+                                    .font(.system(size: 13))
+                                    .foregroundColor(.secondary.opacity(0.6))
+                                    .frame(width: 28, height: 28)
+                                    .help(loc("help.systemProtected"))
+                            } else {
+                                Button(role: .destructive) {
+                                    itemToTrash = file
+                                    showTrashConfirm = true
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(ModernRowActionStyle(isDanger: true))
+                                .help(loc("help.moveToTrash"))
                             }
-                            .buttonStyle(ModernRowActionStyle(isDanger: true))
-                            .help(loc("help.moveToTrash"))
                         }
                     }
                     .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))

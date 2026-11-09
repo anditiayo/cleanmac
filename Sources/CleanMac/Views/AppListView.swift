@@ -178,21 +178,36 @@ public struct AppListView: View {
                                         .font(.body)
                                         .fontWeight(.medium)
 
-                                    Text(loc("tag.app"))
-                                        .font(.caption2)
+                                    if app.isSystemApp {
+                                        HStack(spacing: 3) {
+                                            Image(systemName: "lock.shield.fill")
+                                                .font(.system(size: 9))
+                                            Text(loc("tag.systemProtected"))
+                                                .font(.caption2)
+                                                .fontWeight(.medium)
+                                        }
                                         .padding(.horizontal, 6)
                                         .padding(.vertical, 2)
-                                        .background(Color.blue.opacity(0.15))
-                                        .foregroundColor(.blue)
+                                        .background(Color.orange.opacity(0.15))
+                                        .foregroundColor(.orange)
                                         .cornerRadius(4)
+                                    } else {
+                                        Text(loc("tag.app"))
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.blue.opacity(0.15))
+                                            .foregroundColor(.blue)
+                                            .cornerRadius(4)
 
-                                    Text(loc("tag.uninstaller"))
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.purple.opacity(0.15))
-                                        .foregroundColor(.purple)
-                                        .cornerRadius(4)
+                                        Text(loc("tag.uninstaller"))
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.purple.opacity(0.15))
+                                            .foregroundColor(.purple)
+                                            .cornerRadius(4)
+                                    }
                                 }
 
                                 Text(app.url.path)
@@ -227,13 +242,21 @@ public struct AppListView: View {
                             .buttonStyle(ModernRowActionStyle(tint: .secondary))
                             .help(loc("help.showInFinder"))
 
-                            Button(role: .destructive) {
-                                appToUninstall = app
-                            } label: {
-                                Image(systemName: "trash")
+                            if app.isSystemApp {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary.opacity(0.6))
+                                    .frame(width: 28, height: 28)
+                                    .help(loc("help.systemAppProtected"))
+                            } else {
+                                Button(role: .destructive) {
+                                    appToUninstall = app
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(ModernRowActionStyle(isDanger: true))
+                                .help(loc("help.uninstallClean"))
                             }
-                            .buttonStyle(ModernRowActionStyle(isDanger: true))
-                            .help(loc("help.uninstallClean"))
                         }
                     }
                     .listRowInsets(EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10))
